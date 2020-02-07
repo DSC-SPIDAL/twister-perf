@@ -1,27 +1,29 @@
 #!/bin/bash
 
-if [ $# -ne "1" ]; then
-  echo "Please provide following parameters: numberOfWorkers"
-  exit 1
+jobID=`cat $HOME/.twister2/last-job-id.txt`
+
+# jobID can be provided from command line also
+if [ $# -eq "1" ]; then
+  jobID=$1
+  echo "JobID provided from command line."
 fi
 
-workers=$1
+echo jobID: $jobID
+
 logsDir=logs-t2
 
 # remove pids.txt file if exist
 rm -f pids.txt 2>/dev/null
 
-jobID=`cat $HOME/.twister2/last-job-id.txt`
 logsDir=${logsDir}/${jobID}
 mkdir $logsDir 2>/dev/null
 echo "created logs directory: $logsDir"
 
-jm=${jobID}-jm-0
-kubectl logs --follow ${jm} &> ${logsDir}/${jm}.log &
-echo $! >> pids.txt
+label=twister2-job-pods=t2pod-lb-${jobID}
+pods=$(kubectl get pods -l $label --output=jsonpath={.items..metadata.name})
+readarray -t podArray <<<"$pods"
 
-for (( i=0; i<workers; i++)); do
-  pod=${jobID}-0-${i}
+for pod in $podArray; do
   podLogFile=${logsDir}/${pod}.log
   echo $podLogFile
   kubectl logs --follow $pod &> ${podLogFile} &
