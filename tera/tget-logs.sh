@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -ne "2" ]; then
+if [ $# -ne "1" ]; then
   echo "Please provide following parameters: numberOfWorkers"
   exit 1
 fi
@@ -12,7 +12,7 @@ logsDir=logs-t2
 rm -f pids.txt 2>/dev/null
 
 jobID=`cat $HOME/.twister2/last-job-id.txt`
-logsDir=${logsDir}/jobID
+logsDir=${logsDir}/${jobID}
 mkdir $logsDir 2>/dev/null
 echo "created logs directory: $logsDir"
 
@@ -22,7 +22,8 @@ echo $! >> pids.txt
 
 for (( i=0; i<workers; i++)); do
   pod=${jobID}-0-${i}
-  echo $pod
-  kubectl logs --follow $pod &> ${logsDir}/${pod}.log &
+  podLogFile=${logsDir}/${pod}.log
+  echo $podLogFile
+  kubectl logs --follow $pod &> ${podLogFile} &
   echo $! >> pids.txt
 done
