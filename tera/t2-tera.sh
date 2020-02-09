@@ -24,11 +24,12 @@ ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-ja
   -keySize 10 \
   -instances $workers \
   -instanceCPUs 1 \
-  -instanceMemory 2048 \
+  -instanceMemory 6144 \
   -sources $workers \
   -sinks $workers \
-  -memoryBytesLimit 4000000000 \
-  -fileSizeBytes 100000000
+  -memoryBytesLimit 200000000 \
+  -fileSizeBytes 100000000 \
+  -volatileDisk 4.0
 
 # the pod that end with "-0-0"
 # firstPod=$(kubectl get pods --output=jsonpath={.items..metadata.name} | grep -o "[^[:space:]]*-0-0")
