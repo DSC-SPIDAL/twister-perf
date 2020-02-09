@@ -36,29 +36,26 @@ ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-ja
 jobID=`cat $HOME/.twister2/last-job-id.txt`
 firstPod=${jobID}-0-0
 
-########################################
-# wait until sorting finished
-delayLine=""
-
-while [ -z "$delayLine" ]; do
-
-  echo "Job has not completed yet. Waiting 10 sec..."
-
-  # sleep
-  sleep 10
-
-  # get result line from first pod
-  delayLine=$(kubectl logs $firstPod | grep "Total time for all iterations")
+# wait for the first pod to become Running
+until kubectl get pod $firstPod 2> /dev/null | grep Running; do
+  sleep 0.5;
+  echo waiting pod to start;
 done
 
-echo "Sorting completed."
-
-# save the log file
+########################################
+# wait until sorting finished
 logFile=${logsDir}/${firstPod}.log
-kubectl logs $firstPod > ${logFile}
+# if unbuffer exists, use it
+if hash unbuffer 2>/dev/null; then
+  unbuffer kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
+else
+  kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
+fi
+
 echo saved the log file to: ${logFile}
 
 # get delay and write it to file
+delayLine=$(cat $logFile | grep "Total time for all iterations")
 trimmedLine=$(echo $delayLine | awk '{$1=$1};1' )
 delay=${trimmedLine##* }
 
