@@ -49,7 +49,10 @@ logFile=${logsDir}/${firstPod}.log
 if hash unbuffer 2>/dev/null; then
   unbuffer kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
 else
-  kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
+#  kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
+  echo Getting $firstPod logs to $logFile
+  echo waiting it to complete...
+  kubectl logs --follow $firstPod > ${logFile}
 fi
 
 echo saved the log file to: ${logFile}
