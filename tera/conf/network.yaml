@@ -143,16 +143,16 @@ twister2.network.receiveBuffer.count.batch.partition: 4
 
 ## Keyed Gather ##
 # the partitioning algorithm
-twister2.network.alltoall.algorithm.batch.keyed_gather: "ring"
+twister2.network.alltoall.algorithm.batch.keyed_gather: "simple"
 
 # ring group worker
 ttwister2.network.partition.ring.group.workers.batch.keyed_gather: 4
 
 # the buffer size to be used
-twister2.network.buffer.size.batch.keyed_gather: 16024000
+twister2.network.buffer.size.batch.keyed_gather: 1024000
 
 # number of send buffers to be used
-twister2.network.sendBuffer.count.batch.keyed_gather: 4
+twister2.network.sendBuffer.count.batch.keyed_gather: 1
 
 # number of receive buffers to be used
 twister2.network.receiveBuffer.count.batch.keyed_gather: 1
