@@ -36,26 +36,28 @@ ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-ja
 jobID=`cat $HOME/.twister2/last-job-id.txt`
 firstPod=${jobID}-0-0
 
+logFile=$(find $HOME/.twister2/${jobID} -name "worker0-*")
+
 # wait for the first pod to become Running
-until kubectl get pod $firstPod 2> /dev/null | grep Running; do
-  sleep 0.5;
-  echo waiting pod to start;
-done
+# until kubectl get pod $firstPod 2> /dev/null | grep Running; do
+#   sleep 1
+#  echo waiting pod to start
+#done
 
 ########################################
 # wait until sorting finished
-logFile=${logsDir}/${firstPod}.log
+#logFile=${logsDir}/${firstPod}.log
 # if unbuffer exists, use it
-if hash unbuffer 2>/dev/null; then
-  unbuffer kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
-else
+#if hash unbuffer 2>/dev/null; then
+#  unbuffer kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
+#else
 #  kubectl logs --follow $firstPod 2>&1 | tee ${logFile}
-  echo Getting $firstPod logs to $logFile
-  echo waiting it to complete...
-  kubectl logs --follow $firstPod > ${logFile}
-fi
+#  echo Getting $firstPod logs to $logFile
+#  echo waiting it to complete...
+#  kubectl logs --follow $firstPod > ${logFile}
+#fi
 
-echo saved the log file to: ${logFile}
+#echo saved the log file to: ${logFile}
 
 # get delay and write it to file
 delayLine=$(cat $logFile | grep "Total time for all iterations")
@@ -66,4 +68,4 @@ echo -e "${jobID}\t${workers}\t${totalData}\t${delay}" >> $outFile
 echo -e "${jobID}\t${workers}\t${totalData}\t${delay}"
 
 # kill the job
-${T2_HOME}/bin/twister2 kill kubernetes $jobID
+# ${T2_HOME}/bin/twister2 kill kubernetes $jobID

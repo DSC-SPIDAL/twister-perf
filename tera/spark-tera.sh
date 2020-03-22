@@ -14,7 +14,7 @@ dataSizePerWorkerGB=$2
 
 jobName=j1
 workerCPU=1.0
-mem=4g
+mem=6g
 
 #uploadMethod=s3
 uploadMethod=pod
@@ -56,9 +56,10 @@ ${SPARK_HOME}/bin/spark-submit \
     --conf spark.kubernetes.executor.request.cores=${workerCPU} \
     --conf spark.kubernetes.executor.limit.cores=${workerCPU} \
     --conf spark.kubernetes.allocation.batch.size=${workers} \
-    --conf spark.memory.fraction=0.3 \
     $url \
     $dataSizePerWorkerGB $parallel $keySize $dataSize $writeToFile
+
+#    --conf spark.memory.fraction=0.3 \
 
 if [ "$?" -ne "0" ]; then
   echo Spark job failed.
@@ -84,4 +85,4 @@ echo -e "${driver}\t${mem}\t${workers}\t${totalData}\t${delay}" >> $outFile
 echo -e "${driver}\t${mem}\t${workers}\t${totalData}\t${delay}"
 
 echo deleting driver pod and the associated service
-./kill-spark-tera.sh $driver
+./skill.sh $driver
