@@ -6,7 +6,7 @@ if [ $# -ne "2" ]; then
 fi
 
 outFile="results-twister2.txt"
-logsDir=${PWD}/logs-t2
+logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 
 # copy network.yaml file to t2 conf directory

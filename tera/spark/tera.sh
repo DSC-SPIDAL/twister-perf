@@ -6,7 +6,7 @@ if [ $# -ne "2" ]; then
 fi
 
 outFile="results-spark.txt"
-logsDir=${PWD}/logs-spark
+logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 
 workers=$1
@@ -85,4 +85,4 @@ echo -e "${driver}\t${mem}\t${workers}\t${totalData}\t${delay}" >> $outFile
 echo -e "${driver}\t${mem}\t${workers}\t${totalData}\t${delay}"
 
 echo deleting driver pod and the associated service
-./skill.sh $driver
+./kill.sh $driver
