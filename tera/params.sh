@@ -7,4 +7,4 @@ export SPARK_HOME="${HOME}/projects/spark-perf/spark-3.0.0-preview2-bin-hadoop2.
 # master=$(kubectl cluster-info | head -n 1 | awk '{ print $NF }')
 #K8S_MASTER=k8s://https://ip:port
 
-export T2_HOME=${HOME}/projects/twister2/twister2-0.5.0-SNAPSHOT
+export T2_HOME=${HOME}/twister2/twister2-0.6.0-SNAPSHOT
