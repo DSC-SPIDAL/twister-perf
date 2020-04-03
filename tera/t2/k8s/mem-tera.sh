@@ -5,6 +5,9 @@ if [ $# -ne "2" ]; then
   exit 1
 fi
 
+# memory bytes limit 2gb
+# no need to go to disk
+
 outFile="results.txt"
 logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
@@ -27,7 +30,7 @@ ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-ja
   -instanceMemory 6144 \
   -sources $workers \
   -sinks $workers \
-  -memoryBytesLimit 200000000 \
+  -memoryBytesLimit 2000000000 \
   -fileSizeBytes 100000000 \
   -volatileDisk 1.0
 
