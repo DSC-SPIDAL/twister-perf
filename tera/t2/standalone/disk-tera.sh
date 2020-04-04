@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# twister2 uses 3gb of memory
+# twister2 uses 4gb of memory
 # each workers keeps 200MB of terasort data in memory
 # it saves extra data to disk.
 # if the disk is configured as /dev/shm, it is also memory based 
@@ -15,8 +15,9 @@ logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 logFile1=${logsDir}/current.log
 
-# copy network.yaml file to t2 conf directory
-cp -f conf/network.yaml ${T2_HOME}/conf/common/
+# copy common and standalone config filese to t2 conf directory
+cp -f conf/common/* ${T2_HOME}/conf/common/
+cp -f conf/standalone/* ${T2_HOME}/conf/standalone/
 
 # total data size for all workers in GB
 workers=$1
@@ -30,12 +31,12 @@ ${T2_HOME}/bin/twister2 submit standalone jar ${T2_HOME}/examples/libexamples-ja
   -keySize 10 \
   -instances $workers \
   -instanceCPUs 1 \
-  -instanceMemory 3072 \
+  -instanceMemory 4096 \
   -sources $workers \
   -sinks $workers \
   -memoryBytesLimit 200000000 \
   -fileSizeBytes 100000000 \
-  -volatileDisk 4.0 \
+  -volatileDisk 1.0 \
   2>&1 | tee ${logFile1}
 
 # the pod that end with "-0-0"

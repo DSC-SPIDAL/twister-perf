@@ -14,8 +14,9 @@ logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 logFile1=${logsDir}/current.log
 
-# copy network.yaml file to t2 conf directory
-cp -f conf/network.yaml ${T2_HOME}/conf/common/
+# copy common and standalone config filese to t2 conf directory
+cp -f conf/common/* ${T2_HOME}/conf/common/
+cp -f conf/standalone/* ${T2_HOME}/conf/standalone/
 
 # total data size for all workers in GB
 workers=$1
@@ -29,12 +30,12 @@ ${T2_HOME}/bin/twister2 submit standalone jar ${T2_HOME}/examples/libexamples-ja
   -keySize 10 \
   -instances $workers \
   -instanceCPUs 1 \
-  -instanceMemory 6144 \
+  -instanceMemory 4096 \
   -sources $workers \
   -sinks $workers \
   -memoryBytesLimit 2000000000 \
   -fileSizeBytes 100000000 \
-  -volatileDisk 4.0 \
+  -volatileDisk 1.0 \
   2>&1 | tee ${logFile1}
 
 # the pod that end with "-0-0"

@@ -10,8 +10,9 @@ logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 logFile1=${logsDir}/current.log
 
-# copy network.yaml file to t2 conf directory
-cp -f conf/network.yaml ${T2_HOME}/conf/common/
+# copy common and standalone config filese to t2 conf directory
+cp -f conf/common/* ${T2_HOME}/conf/common/
+cp -f conf/standalone/* ${T2_HOME}/conf/standalone/
 
 # total data size for all workers in GB
 workers=$1
