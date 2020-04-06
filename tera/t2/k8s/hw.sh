@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne "3" ]; then
-  echo "Please provide following parameters: numberOfWorkers dataSizePerWorkerGB memoryBytesLimitMB"
+if [ $# -ne "1" ]; then
+  echo "Please provide following parameters: numberOfWorkers"
   exit 1
 fi
 
@@ -10,7 +10,6 @@ if [ -z "$T2_HOME" ]; then
   exit 1
 fi
 
-outFile="results.txt"
 logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 
@@ -20,25 +19,9 @@ cp -f conf/kubernetes/* ${T2_HOME}/conf/kubernetes/
 
 # total data size for all workers in GB
 workers=$1
-dataSizePerWorker=$2
-memoryBytesLimitMB=$3
-
-totalData=$( echo $dataSizePerWorker $workers | awk '{print $1 * $2}')
-memoryBytesLimit=$((memoryBytesLimitMB * 1024 * 1024))
 
 ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-java.jar \
-  edu.iu.dsc.tws.examples.batch.terasort.TeraSort \
-  -size $totalData \
-  -valueSize 90 \
-  -keySize 10 \
-  -instances $workers \
-  -instanceCPUs 1 \
-  -instanceMemory 6144 \
-  -sources $workers \
-  -sinks $workers \
-  -memoryBytesLimit $memoryBytesLimit \
-  -fileSizeBytes 100000000 \
-  -volatileDisk 1.0
+  edu.iu.dsc.tws.examples.basic.HelloWorld  $workers
 
 # the pod that end with "-0-0"
 jobID=`cat $HOME/.twister2/last-job-id.txt`
@@ -68,16 +51,6 @@ else
 fi
 
 echo saved the log file to: ${logFile}
-
-
-########################################
-# get delay and write it to file
-delayLine=$(cat $logFile | grep "Total time for all iterations")
-trimmedLine=$(echo $delayLine | awk '{$1=$1};1' )
-delay=${trimmedLine##* }
-
-echo -e "${jobID}\t${workers}\t${totalData}\t${delay}" >> $outFile
-echo -e "${jobID}\t${workers}\t${totalData}\t${delay}"
 
 # no need to kill the job, it is deleted if it completes successfully
 # ${T2_HOME}/bin/twister2 kill kubernetes $jobID

@@ -6,14 +6,16 @@ if [ $# -ne "2" ]; then
 fi
 
 # memory bytes limit 200mb
-# it will go to disk after 200mb on each worker
+# it will go to disk after 200mb on each worker, we use memory based disk
+# 4gb jvm memory, 2gb extra pod memory for ram based disk and mpi
 
 outFile="results.txt"
 logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 
-# copy network.yaml file to t2 conf directory
-cp -f conf/network.yaml ${T2_HOME}/conf/common/
+# copy common and kubernetes config filese to t2 conf directory
+cp -f conf/common/* ${T2_HOME}/conf/common/
+cp -f conf/kubernetes/* ${T2_HOME}/conf/kubernetes/
 
 # total data size for all workers in GB
 workers=$1

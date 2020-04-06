@@ -7,13 +7,15 @@ fi
 
 # memory bytes limit 2gb
 # no need to go to disk
+# java memory is set to 4gb, 2gb extra given for non-jvm memory for mpi
 
 outFile="results.txt"
 logsDir=${PWD}/logs
 mkdir $logsDir 2>/dev/null
 
-# copy network.yaml file to t2 conf directory
-cp -f conf/network.yaml ${T2_HOME}/conf/common/
+# copy common and kubernetes config filese to t2 conf directory
+cp -f conf/common/* ${T2_HOME}/conf/common/
+cp -f conf/kubernetes/* ${T2_HOME}/conf/kubernetes/
 
 # total data size for all workers in GB
 workers=$1
@@ -27,7 +29,7 @@ ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-ja
   -keySize 10 \
   -instances $workers \
   -instanceCPUs 1 \
-  -instanceMemory 6144 \
+  -instanceMemory 4096 \
   -sources $workers \
   -sinks $workers \
   -memoryBytesLimit 2000000000 \
