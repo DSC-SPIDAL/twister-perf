@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne "2" ]; then
-  echo "Please provide following parameters: numberOfWorkers dataSizePerWorkerGB"
+if [ $# -ne "3" ]; then
+  echo "Please provide following parameters: numberOfWorkers dataSizePerWorkerGB memoryBytesLimitMB"
   exit 1
 fi
 
@@ -17,7 +17,10 @@ cp -f conf/standalone/* ${T2_HOME}/conf/standalone/
 # total data size for all workers in GB
 workers=$1
 dataSizePerWorker=$2
+memoryBytesLimitMB=$3
+
 totalData=$( echo $dataSizePerWorker $workers | awk '{print $1 * $2}')
+memoryBytesLimit=$((memoryBytesLimitMB * 1024 * 1024))
 
 ${T2_HOME}/bin/twister2 submit standalone jar ${T2_HOME}/examples/libexamples-java.jar \
   edu.iu.dsc.tws.examples.batch.terasort.TeraSort \
@@ -26,12 +29,12 @@ ${T2_HOME}/bin/twister2 submit standalone jar ${T2_HOME}/examples/libexamples-ja
   -keySize 10 \
   -instances $workers \
   -instanceCPUs 1 \
-  -instanceMemory 6144 \
+  -instanceMemory 4096 \
   -sources $workers \
   -sinks $workers \
-  -memoryBytesLimit 200000000 \
+  -memoryBytesLimit $memoryBytesLimit \
   -fileSizeBytes 100000000 \
-  -volatileDisk 4.0 \
+  -volatileDisk 1.0 \
   2>&1 | tee ${logFile1}
 
 # the pod that end with "-0-0"
