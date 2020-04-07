@@ -1,7 +1,6 @@
 #!/bin/bash
 
 while true; do
-  kubectl get nodes
+  kubectl get nodes | grep -c node
   sleep 10
-  echo
 done

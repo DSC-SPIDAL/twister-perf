@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne "3" ]; then
-  echo "Please provide following parameters: numberOfWorkers dataSizePerWorkerGB memoryBytesLimitMB"
+  echo "Please provide following parameters: instances dataSizePerWorkerGB memoryBytesLimitMB"
   exit 1
 fi
 
@@ -9,6 +9,9 @@ if [ -z "$T2_HOME" ]; then
   echo T2_HOME is not set.
   exit 1
 fi
+
+# 30 workers are running on each pod
+workersPerPod=30
 
 outFile="results.txt"
 logsDir=${PWD}/logs
@@ -19,21 +22,26 @@ cp -f conf/common/* ${T2_HOME}/conf/common/
 cp -f conf/kubernetes/* ${T2_HOME}/conf/kubernetes/
 
 # total data size for all workers in GB
-workers=$1
+instances=$1
+workers=$((instances * workersPerPod))
 dataSizePerWorker=$2
 memoryBytesLimitMB=$3
 
 totalData=$( echo $dataSizePerWorker $workers | awk '{print $1 * $2}')
 memoryBytesLimit=$((memoryBytesLimitMB * 1024 * 1024))
 
+echo workers: $workers
+echo totalData: $totalData
+echo memoryBytesLimit: $memoryBytesLimit
+
 ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-java.jar \
   edu.iu.dsc.tws.examples.batch.terasort.TeraSort \
   -size $totalData \
   -valueSize 90 \
   -keySize 10 \
-  -instances $workers \
+  -instances $instances \
   -instanceCPUs 1 \
-  -instanceMemory 6144 \
+  -instanceMemory 4096 \
   -sources $workers \
   -sinks $workers \
   -memoryBytesLimit $memoryBytesLimit \

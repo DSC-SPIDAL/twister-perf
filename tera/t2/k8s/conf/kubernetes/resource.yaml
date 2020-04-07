@@ -27,7 +27,7 @@ twister2.resource.class.launcher: edu.iu.dsc.tws.rsched.schedulers.k8s.Kubernete
 
 # image pull policy, by default is IfNotPresent
 # it could also be Always
-# kubernetes.image.pull.policy: "Always"
+kubernetes.image.pull.policy: "Always"
 
 # get log messages to twister2 client and save in files
 # it is false by default
@@ -105,7 +105,7 @@ twister2.resource.kubernetes.storage.access.mode: "ReadWriteMany"
 # K8sUploader Settings
 #########################################################################
 
-twister2.resource.class.uploader: "edu.iu.dsc.tws.rsched.uploaders.k8s.K8sUploader"
+# twister2.resource.class.uploader: "edu.iu.dsc.tws.rsched.uploaders.k8s.K8sUploader"
 
 # When a job is submitted, the job package needs to be transferred to worker pods
 # K8sUploader provides two upload methods:
@@ -147,7 +147,7 @@ twister2.resource.class.uploader: "edu.iu.dsc.tws.rsched.uploaders.k8s.K8sUpload
 #   Specify bucket name
 #   If your job will run more than 2 hours and it is fault tolerant, update link.expiration.duration
 
-#twister2.resource.class.uploader: "edu.iu.dsc.tws.rsched.uploaders.s3.S3Uploader"
+twister2.resource.class.uploader: "edu.iu.dsc.tws.rsched.uploaders.s3.S3Uploader"
 
 # s3 bucket name to upload the job package
 # workers will download the job package from this location
