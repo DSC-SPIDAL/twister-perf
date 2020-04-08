@@ -27,7 +27,7 @@ twister2.resource.class.launcher: edu.iu.dsc.tws.rsched.schedulers.k8s.Kubernete
 
 # image pull policy, by default is IfNotPresent
 # it could also be Always
-kubernetes.image.pull.policy: "Always"
+# kubernetes.image.pull.policy: "Always"
 
 # get log messages to twister2 client and save in files
 # it is false by default
