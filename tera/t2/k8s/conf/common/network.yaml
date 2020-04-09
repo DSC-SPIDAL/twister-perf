@@ -31,7 +31,8 @@ twister2.network.message.grouping.size: 20000
 # This can be used to balance the load between multiple devices, by specifying directory locations
 # from different devices.
 # twister2.network.ops.persistent.dirs: ["/scratch/skamburu/terasort"]
-twister2.network.ops.persistent.dirs: ["/twister2-volatile"]
+# twister2.network.ops.persistent.dirs: ["/twister2-volatile"]
+twister2.network.ops.persistent.dirs: ["/twister2-memory-dir"]
 # twister2.network.ops.persistent.dirs: ["/dev/shm"]
 
 # the maximum amount of bytes kept in memory for operations that goes to disk

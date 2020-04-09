@@ -40,12 +40,11 @@ ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-ja
   -keySize 10 \
   -instances $instances \
   -instanceCPUs 1 \
-  -instanceMemory 4096 \
+  -instanceMemory 6144 \
   -sources $workers \
   -sinks $workers \
   -memoryBytesLimit $memoryBytesLimit \
   -fileSizeBytes 100000000 \
-  -volatileDisk 1.0 \
   -workersPerPod $workersPerPod
 
 # the pod that end with "-0-0"
