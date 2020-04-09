@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne "3" ]; then
-  echo "Please provide following parameters: instances dataSizePerWorkerGB memoryBytesLimitMB"
+if [ $# -ne "4" ]; then
+  echo "Please provide following parameters: instances workersPerPod dataSizePerWorkerGB memoryBytesLimitMB"
   exit 1
 fi
 
@@ -9,9 +9,6 @@ if [ -z "$T2_HOME" ]; then
   echo T2_HOME is not set.
   exit 1
 fi
-
-# 30 workers are running on each pod
-workersPerPod=30
 
 outFile="results.txt"
 logsDir=${PWD}/logs
@@ -23,14 +20,16 @@ cp -f conf/kubernetes/* ${T2_HOME}/conf/kubernetes/
 
 # total data size for all workers in GB
 instances=$1
-workers=$((instances * workersPerPod))
-dataSizePerWorker=$2
-memoryBytesLimitMB=$3
+workersPerPod=$2
+dataSizePerWorker=$3
+memoryBytesLimitMB=$4
 
+workers=$((instances * workersPerPod))
 totalData=$( echo $dataSizePerWorker $workers | awk '{print $1 * $2}')
 memoryBytesLimit=$((memoryBytesLimitMB * 1024 * 1024))
 
 echo workers: $workers
+echo workersPerPod: $workersPerPod
 echo totalData: $totalData
 echo memoryBytesLimit: $memoryBytesLimit
 
@@ -46,7 +45,8 @@ ${T2_HOME}/bin/twister2 submit kubernetes jar ${T2_HOME}/examples/libexamples-ja
   -sinks $workers \
   -memoryBytesLimit $memoryBytesLimit \
   -fileSizeBytes 100000000 \
-  -volatileDisk 1.0
+  -volatileDisk 1.0 \
+  -workersPerPod $workersPerPod
 
 # the pod that end with "-0-0"
 jobID=`cat $HOME/.twister2/last-job-id.txt`

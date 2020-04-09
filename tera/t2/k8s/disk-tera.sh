@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne "1" ]; then
-  echo "Please provide following parameters: instances"
+if [ $# -ne "2" ]; then
+  echo "Please provide following parameters: instances workersPerPod"
   exit 1
 fi
 
@@ -13,5 +13,5 @@ fi
 dataSizePerWorkerGB=1
 memoryBytesLimitMB=200
 
-./tera.sh $1 $dataSizePerWorkerGB $memoryBytesLimitMB
+./tera.sh $1 $2 $dataSizePerWorkerGB $memoryBytesLimitMB
 
