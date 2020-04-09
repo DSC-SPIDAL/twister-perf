@@ -6,9 +6,16 @@
 # the disk is configured as /dev/shm, it is also memory based 
 
 if [ $# -ne "2" ]; then
-  echo "Please provide following parameters: numberOfWorkers dataSizePerWorkerGB"
+  echo "Please provide following parameters: nodes workersPerNode"
   exit 1
 fi
 
-./tera $1 $2 200
+nodes=$1
+workersPerNode=$2
+workers=$((nodes * workersPerNode))
+
+dataSizePerWorkerGB=1
+memoryBytesLimitMB=200
+
+./tera.sh $workers $dataSizePerWorkerGB $memoryBytesLimitMB
 

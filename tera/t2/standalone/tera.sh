@@ -22,6 +22,10 @@ memoryBytesLimitMB=$3
 totalData=$( echo $dataSizePerWorker $workers | awk '{print $1 * $2}')
 memoryBytesLimit=$((memoryBytesLimitMB * 1024 * 1024))
 
+echo workers: $workers
+echo totalData: $totalData
+echo memoryBytesLimit: $memoryBytesLimit
+
 ${T2_HOME}/bin/twister2 submit standalone jar ${T2_HOME}/examples/libexamples-java.jar \
   edu.iu.dsc.tws.examples.batch.terasort.TeraSort \
   -size $totalData \
