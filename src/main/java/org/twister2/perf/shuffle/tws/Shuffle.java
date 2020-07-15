@@ -4,6 +4,7 @@ import edu.iu.dsc.tws.api.JobConfig;
 import edu.iu.dsc.tws.api.Twister2Job;
 import edu.iu.dsc.tws.api.config.Config;
 import edu.iu.dsc.tws.api.resource.IWorker;
+import edu.iu.dsc.tws.api.resource.Twister2Worker;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
 import org.twister2.perf.shuffle.tws.bigint.InMemoryBigIntShuffle;
@@ -39,7 +40,7 @@ public class Shuffle {
     jobConfig.put(Context.ARG_CSV, csv);
     jobConfig.put(Context.ARG_WRITE, write);
 
-    Class<? extends IWorker> c;
+    Class<? extends Twister2Worker> c;
     if (writer.equals("string")) {
       c = StringShuffle.class;
     } else if (writer.equals("bigint")) {

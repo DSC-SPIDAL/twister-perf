@@ -18,12 +18,12 @@ import edu.iu.dsc.tws.api.tset.fn.SourceFunc;
 import edu.iu.dsc.tws.data.utils.FileSystemUtils;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
-import edu.iu.dsc.tws.tset.env.BatchTSetEnvironment;
+import edu.iu.dsc.tws.tset.env.BatchEnvironment;
+import edu.iu.dsc.tws.tset.env.TSetEnvironment;
 import edu.iu.dsc.tws.tset.fn.HashingPartitioner;
 import edu.iu.dsc.tws.tset.sets.batch.CachedTSet;
 import edu.iu.dsc.tws.tset.sets.batch.KeyedSourceTSet;
 import edu.iu.dsc.tws.tset.sets.batch.SinkTSet;
-import edu.iu.dsc.tws.tset.sets.batch.SourceTSet;
 import iu.iuni.deletion.io.TweetIdReader;
 import iu.iuni.deletion.io.TweetTextReader;
 import iu.iuni.deletion.io.TweetWriter;
@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MembershipFinder2 implements IWorker, Serializable {
+public class MembershipFinder2 implements Twister2Worker, Serializable {
   private static final Logger LOG = Logger.getLogger(MembershipFinder2.class.getName());
 
   public static void main(String[] args) {
@@ -67,13 +67,9 @@ public class MembershipFinder2 implements IWorker, Serializable {
   }
 
   @Override
-  public void execute(Config config, int workerID,
-                      IWorkerController workerController,
-                      IPersistentVolume persistentVolume,
-                      IVolatileVolume volatileVolume) {
-    BatchTSetEnvironment batchEnv = BatchTSetEnvironment.initBatch(WorkerEnvironment.init(
-        config, workerID, workerController, persistentVolume, volatileVolume));
-
+  public void execute(WorkerEnvironment workerEnvironment) {
+    BatchEnvironment batchEnv = TSetEnvironment.initBatch(workerEnvironment);
+    Config config = workerEnvironment.getConfig();
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
     // now lets read the second input file and cache it
     CachedTSet<BigInteger> deleteInput = batchEnv.createSource(new DeleteTweetSource(),

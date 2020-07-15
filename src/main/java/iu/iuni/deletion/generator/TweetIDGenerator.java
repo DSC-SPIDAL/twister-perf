@@ -3,10 +3,7 @@ package iu.iuni.deletion.generator;
 import edu.iu.dsc.tws.api.JobConfig;
 import edu.iu.dsc.tws.api.Twister2Job;
 import edu.iu.dsc.tws.api.config.Config;
-import edu.iu.dsc.tws.api.resource.IPersistentVolume;
-import edu.iu.dsc.tws.api.resource.IVolatileVolume;
-import edu.iu.dsc.tws.api.resource.IWorker;
-import edu.iu.dsc.tws.api.resource.IWorkerController;
+import edu.iu.dsc.tws.api.resource.*;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
 import iu.iuni.deletion.Context;
@@ -21,14 +18,14 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
-public class TweetIDGenerator implements IWorker {
+public class TweetIDGenerator implements Twister2Worker {
   private static final Logger LOG = Logger.getLogger(TweetIDGenerator.class.getName());
 
   @Override
-  public void execute(Config config, int workerID,
-                      IWorkerController workerController,
-                      IPersistentVolume persistentVolume,
-                      IVolatileVolume volatileVolume) {
+  public void execute(WorkerEnvironment workerEnvironment) {
+    Config config = workerEnvironment.getConfig();
+    int workerID = workerEnvironment.getWorkerId();
+
     String prefix = config.getStringValue(Context.ARG_OUTPUT_DIRECTORY);
     boolean csv = true;
     int records = config.getIntegerValue(Context.ARG_TUPLES);

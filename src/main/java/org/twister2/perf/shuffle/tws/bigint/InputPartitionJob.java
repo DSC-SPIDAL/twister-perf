@@ -10,7 +10,8 @@ import edu.iu.dsc.tws.api.tset.fn.SinkFunc;
 import edu.iu.dsc.tws.api.tset.fn.SourceFunc;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
-import edu.iu.dsc.tws.tset.env.BatchTSetEnvironment;
+import edu.iu.dsc.tws.tset.env.BatchEnvironment;
+import edu.iu.dsc.tws.tset.env.TSetEnvironment;
 import edu.iu.dsc.tws.tset.fn.HashingPartitioner;
 import edu.iu.dsc.tws.tset.sets.batch.SinkTSet;
 import org.twister2.perf.io.FileReader;
@@ -29,7 +30,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class InputPartitionJob implements IWorker, Serializable {
+public class InputPartitionJob implements Twister2Worker, Serializable {
   private static final Logger LOG = Logger.getLogger(InputPartitionJob.class.getName());
 
   public static void main(String[] args) {
@@ -62,10 +63,9 @@ public class InputPartitionJob implements IWorker, Serializable {
   }
 
   @Override
-  public void execute(Config config, int workerID, IWorkerController workerController,
-                      IPersistentVolume persistentVolume, IVolatileVolume volatileVolume) {
-    BatchTSetEnvironment batchEnv = BatchTSetEnvironment.initBatch(WorkerEnvironment.init(
-        config, workerID, workerController, persistentVolume, volatileVolume));
+  public void execute(WorkerEnvironment workerEnvironment) {
+    BatchEnvironment batchEnv = TSetEnvironment.initBatch(workerEnvironment);
+    Config config = workerEnvironment.getConfig();
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
     // first we are going to read the files and sort them
     SinkTSet<Iterator<Tuple<BigInteger, Long>>> sink1 = batchEnv.createKeyedSource(new SourceFunc<Tuple<BigInteger, Long>>() {

@@ -6,7 +6,8 @@ import edu.iu.dsc.tws.api.resource.*;
 import edu.iu.dsc.tws.api.tset.TSetContext;
 import edu.iu.dsc.tws.api.tset.fn.SinkFunc;
 import edu.iu.dsc.tws.api.tset.fn.SourceFunc;
-import edu.iu.dsc.tws.tset.env.BatchTSetEnvironment;
+import edu.iu.dsc.tws.tset.env.BatchEnvironment;
+import edu.iu.dsc.tws.tset.env.TSetEnvironment;
 import edu.iu.dsc.tws.tset.fn.HashingPartitioner;
 import edu.iu.dsc.tws.tset.sets.batch.SinkTSet;
 import org.twister2.perf.shuffle.Context;
@@ -17,13 +18,15 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-public class InMemoryBigIntShuffle implements IWorker, Serializable {
+public class InMemoryBigIntShuffle implements Twister2Worker, Serializable {
   private static final Logger LOG = Logger.getLogger(InMemoryBigIntShuffle.class.getName());
   @Override
-  public void execute(Config config, int workerID, IWorkerController workerController, IPersistentVolume persistentVolume, IVolatileVolume volatileVolume) {
+  public void execute(WorkerEnvironment workerEnvironment) {
     long start = System.currentTimeMillis();
-    BatchTSetEnvironment batchEnv = BatchTSetEnvironment.initBatch(WorkerEnvironment.init(
-        config, workerID, workerController, persistentVolume, volatileVolume));
+    BatchEnvironment batchEnv = TSetEnvironment.initBatch(workerEnvironment);
+    Config config = workerEnvironment.getConfig();
+    int workerID = workerEnvironment.getWorkerId();
+
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
     // first we are going to read the files and sort them
     SinkTSet<Iterator<Tuple<BigInteger, Long>>> sink1 = batchEnv.createKeyedSource(new SourceFunc<Tuple<BigInteger, Long>>() {

@@ -7,6 +7,7 @@ import edu.iu.dsc.tws.api.resource.IPersistentVolume;
 import edu.iu.dsc.tws.api.resource.IVolatileVolume;
 import edu.iu.dsc.tws.api.resource.IWorker;
 import edu.iu.dsc.tws.api.resource.IWorkerController;
+import edu.iu.dsc.tws.proto.system.job.JobAPI;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
 import org.twister2.perf.io.TweetBufferedOutputWriter;
@@ -20,10 +21,12 @@ public class WritingJob implements IWorker {
   private static final Logger LOG = Logger.getLogger(WritingJob.class.getName());
 
   @Override
-  public void execute(Config config, int workerID,
+  public void execute(Config config,
+                      JobAPI.Job job,
                       IWorkerController workerController,
                       IPersistentVolume persistentVolume,
                       IVolatileVolume volatileVolume) {
+    int workerID = workerController.getWorkerInfo().getWorkerID();
     String prefix = config.getStringValue(Context.ARG_FILE_PREFIX);
     boolean csv = config.getBooleanValue(Context.ARG_CSV);
     int records = config.getIntegerValue(Context.ARG_TUPLES);
