@@ -4,6 +4,7 @@ import edu.iu.dsc.tws.api.JobConfig;
 import edu.iu.dsc.tws.api.Twister2Job;
 import edu.iu.dsc.tws.api.config.Config;
 import edu.iu.dsc.tws.api.resource.*;
+import edu.iu.dsc.tws.proto.system.job.JobAPI;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
 import iu.iuni.deletion.Context;
@@ -18,13 +19,16 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
-public class TweetIDGenerator implements Twister2Worker {
+public class TweetIDGenerator implements IWorker {
   private static final Logger LOG = Logger.getLogger(TweetIDGenerator.class.getName());
 
   @Override
-  public void execute(WorkerEnvironment workerEnvironment) {
-    Config config = workerEnvironment.getConfig();
-    int workerID = workerEnvironment.getWorkerId();
+  public void execute(Config config,
+                      JobAPI.Job job,
+                      IWorkerController workerController,
+                      IPersistentVolume persistentVolume,
+                      IVolatileVolume volatileVolume) {
+    int workerID = workerController.getWorkerInfo().getWorkerID();
 
     String prefix = config.getStringValue(Context.ARG_OUTPUT_DIRECTORY);
     boolean csv = true;
@@ -92,8 +96,6 @@ public class TweetIDGenerator implements Twister2Worker {
   }
 
   public static void main(String[] args) {
-
-
 
     Config config = ResourceAllocator.loadConfig(new HashMap<>());
     String filePrefix = args[0];
