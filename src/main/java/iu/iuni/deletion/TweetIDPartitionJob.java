@@ -49,8 +49,7 @@ public class TweetIDPartitionJob implements Twister2Worker, Serializable {
     jobConfig.put(Context.ARG_DATE, date);
     jobConfig.put(Context.ARG_TUPLES, tupes);
 
-    Twister2Job twister2Job;
-    twister2Job = Twister2Job.newBuilder()
+    Twister2Job twister2Job = Twister2Job.newBuilder()
         .setJobName(TweetIDPartitionJob.class.getName())
         .setWorkerClass(TweetIDPartitionJob.class)
         .addComputeResource(1, memory, parallel)
@@ -66,12 +65,14 @@ public class TweetIDPartitionJob implements Twister2Worker, Serializable {
     Config config = workerEnvironment.getConfig();
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
     // first we are going to read the files and sort them
-    SinkTSet<Iterator<Tuple<BigInteger, String>>> fileSink = batchEnv.createKeyedSource(new TweeIDSource(),
-        parallel).keyedGatherUngrouped(new HashingPartitioner<>()).useDisk().sink(new TweetWriteSink());
+    SinkTSet<Iterator<Tuple<BigInteger, String>>> fileSink =
+        batchEnv.createKeyedSource(new TweeIDSource(), parallel)
+            .keyedGatherUngrouped(new HashingPartitioner<>())
+            .useDisk()
+            .sink(new TweetWriteSink());
     batchEnv.eval(fileSink);
     batchEnv.finishEval(fileSink);
   }
-
 
   private static class TweetWriteSink implements SinkFunc<Iterator<Tuple<BigInteger, String>>> {
     TSetContext context;
@@ -119,7 +120,7 @@ public class TweetIDPartitionJob implements Twister2Worker, Serializable {
           }
         }
         String s = builder.toString();
-        if (!"".equals(s)){
+        if (!"".equals(s)) {
           writer.writeWithoutEnd(builder.toString());
         }
         writer.close();

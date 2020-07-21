@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 
 /**
  * This job reads two files and write a final file.
- *
+ * <p>
  * 1. All the *TweetID, Date) record set input
  * 2. Deletion input (TweetID) records
  */
@@ -56,8 +56,7 @@ public class MembershipFinder implements Twister2Worker, Serializable {
     jobConfig.put(Context.ARG_OUTPUT_DIRECTORY, outputDir);
     jobConfig.put(Context.ARG_PARALLEL, parallel);
 
-    Twister2Job twister2Job;
-    twister2Job = Twister2Job.newBuilder()
+    Twister2Job twister2Job = Twister2Job.newBuilder()
         .setJobName(MembershipFinder.class.getName())
         .setWorkerClass(MembershipFinder.class)
         .addComputeResource(1, memory, parallel)
@@ -72,43 +71,55 @@ public class MembershipFinder implements Twister2Worker, Serializable {
     BatchEnvironment batchEnv = TSetEnvironment.initBatch(workerEnvironment);
     Config config = workerEnvironment.getConfig();
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
-    // now lets read the second input file and cache it
-    CachedTSet<BigInteger> deleteInput = batchEnv.createSource(new DeleteTweetSource(),
-        parallel).partition(new HashingPartitioner<>()).flatmap(new FlatMapFunc<BigInteger, BigInteger>() {
-      @Override
-      public void flatMap(BigInteger input, RecordCollector<BigInteger> collector) {
-        collector.collect(input);
-      }
-    }).cache();
+
+    // now lets read the tweedIDs to be deleted, partition and cache them
+    CachedTSet<BigInteger> deleteInput = batchEnv
+        .createSource(new DeleteTweetSource(), parallel)
+        .partition(new HashingPartitioner<>())
+        .flatmap(new FlatMapFunc<BigInteger, BigInteger>() {
+          @Override
+          public void flatMap(BigInteger input, RecordCollector<BigInteger> collector) {
+            collector.collect(input);
+          }
+        })
+        .cache();
 
     // now lets read the partitioned file and find the membership
     SourceTSet<Tuple<BigInteger, String>> inputRecords = batchEnv.createSource(new TweetIdSource(), parallel);
 
-    SinkTSet<Iterator<Tuple<String, BigInteger>>> sink = inputRecords.direct().useDisk().flatmap(new FlatMapFunc<Tuple<String, BigInteger>, Tuple<BigInteger, String>>() {
-      Set<BigInteger> inputMap = new HashSet<>();
-      TSetContext context;
-      @Override
-      public void prepare(TSetContext context) {
-        this.context = context;
-        DataPartition a = context.getInput("input");
-        DataPartitionConsumer<BigInteger> consumer = a.getConsumer();
-        while (consumer.hasNext()) {
-          BigInteger bigIntegerLongTuple = consumer.next();
-          inputMap.add(bigIntegerLongTuple);
-        }
-      }
+    SinkTSet<Iterator<Tuple<String, BigInteger>>> sink = inputRecords
+        .direct()
+        .useDisk()
+        .flatmap(new FlatMapFunc<Tuple<String, BigInteger>, Tuple<BigInteger, String>>() {
 
-      @Override
-      public void flatMap(Tuple<BigInteger, String> input, RecordCollector<Tuple<String, BigInteger>> collector) {
-        if (inputMap.contains(input.getKey())) {
-          try {
-            collector.collect(new Tuple(input.getKey().toString(), input.getValue()));
-          } catch (Exception e) {
-            throw new RuntimeException(e);
+          Set<BigInteger> inputMap = new HashSet<>();
+          TSetContext context;
+
+          @Override
+          public void prepare(TSetContext context) {
+            this.context = context;
+            DataPartition a = context.getInput("input");
+            DataPartitionConsumer<BigInteger> consumer = a.getConsumer();
+            while (consumer.hasNext()) {
+              BigInteger bigIntegerLongTuple = consumer.next();
+              inputMap.add(bigIntegerLongTuple);
+            }
           }
-        }
-      }
-    }).addInput("input", deleteInput).partition(new HashingPartitioner<>()).sink(new MembershipWriter());
+
+          @Override
+          public void flatMap(Tuple<BigInteger, String> input, RecordCollector<Tuple<String, BigInteger>> collector) {
+            if (inputMap.contains(input.getKey())) {
+              try {
+                collector.collect(new Tuple(input.getKey().toString(), input.getValue()));
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            }
+          }
+        })
+        .addInput("input", deleteInput)
+        .partition(new HashingPartitioner<>())
+        .sink(new MembershipWriter());
 
     batchEnv.eval(sink);
     batchEnv.finishEval(sink);

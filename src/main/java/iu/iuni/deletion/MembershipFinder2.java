@@ -55,8 +55,7 @@ public class MembershipFinder2 implements Twister2Worker, Serializable {
     jobConfig.put(Context.ARG_PARALLEL, parallel);
     jobConfig.put(Context.ARG_DATE, date);
 
-    Twister2Job twister2Job;
-    twister2Job = Twister2Job.newBuilder()
+    Twister2Job twister2Job = Twister2Job.newBuilder()
         .setJobName(MembershipFinder2.class.getName())
         .setWorkerClass(MembershipFinder2.class)
         .addComputeResource(1, memory, parallel)
@@ -72,20 +71,24 @@ public class MembershipFinder2 implements Twister2Worker, Serializable {
     Config config = workerEnvironment.getConfig();
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
     // now lets read the second input file and cache it
-    CachedTSet<BigInteger> deleteInput = batchEnv.createSource(new DeleteTweetSource(),
-        parallel).partition(new HashingPartitioner<>()).flatmap(new FlatMapFunc<BigInteger, BigInteger>() {
-      int count = 0;
-      @Override
-      public void flatMap(BigInteger input, RecordCollector<BigInteger> collector) {
-        count++;
-        collector.collect(input);
-      }
+    CachedTSet<BigInteger> deleteInput = batchEnv
+        .createSource(new DeleteTweetSource(), parallel)
+        .partition(new HashingPartitioner<>())
+        .flatmap(new FlatMapFunc<BigInteger, BigInteger>() {
+          int count = 0;
 
-      @Override
-      public void close() {
-        LOG.info("Cache produced tuples - " + count);
-      }
-    }).cache();
+          @Override
+          public void flatMap(BigInteger input, RecordCollector<BigInteger> collector) {
+            count++;
+            collector.collect(input);
+          }
+
+          @Override
+          public void close() {
+            LOG.info("Cache produced tuples - " + count);
+          }
+        })
+        .cache();
 
     // now lets read the partitioned file and find the membership
     KeyedSourceTSet<String, BigInteger> inputRecords = batchEnv.createKeyedSource(new TweetIdSource(), parallel).addInput("input", deleteInput);

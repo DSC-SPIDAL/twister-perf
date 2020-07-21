@@ -35,8 +35,7 @@ public class VerifyMembership implements IWorker, Serializable {
     jobConfig.put(Context.ARG_MEMORY, memory);
     jobConfig.put(Context.ARG_SEPARATOR, "\\s+");
 
-    Twister2Job twister2Job;
-    twister2Job = Twister2Job.newBuilder()
+    Twister2Job twister2Job = Twister2Job.newBuilder()
         .setJobName(VerifyMembership.class.getName())
         .setWorkerClass(VerifyMembership.class)
         .addComputeResource(1, memory, parallel)
