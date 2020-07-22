@@ -5,10 +5,10 @@ import edu.iu.dsc.tws.api.config.Config;
 
 import java.math.BigInteger;
 
-public class TweetTextReader extends BaseStreamInputReader<Tuple<BigInteger, String>> {
+public class TweetIdDateReader extends BaseStreamInputReader<Tuple<BigInteger, String>> {
   private String seperator;
 
-  public TweetTextReader(String fileName, Config config, String sep) {
+  public TweetIdDateReader(String fileName, Config config, String sep) {
     super(fileName, config);
     this.seperator = sep;
   }

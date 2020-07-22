@@ -1,4 +1,4 @@
-package iu.iuni.deletion;
+package iu.iuni.deletion.sources;
 
 import edu.iu.dsc.tws.api.comms.structs.Tuple;
 import edu.iu.dsc.tws.api.data.FileStatus;
@@ -7,7 +7,8 @@ import edu.iu.dsc.tws.api.data.Path;
 import edu.iu.dsc.tws.api.tset.TSetContext;
 import edu.iu.dsc.tws.api.tset.fn.SourceFunc;
 import edu.iu.dsc.tws.data.utils.FileSystemUtils;
-import iu.iuni.deletion.io.TweetTextReader;
+import iu.iuni.deletion.Context;
+import iu.iuni.deletion.io.TweetIdDateReader;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,13 +16,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class TweeIDSource implements SourceFunc<Tuple<BigInteger, String>> {
-  private static final Logger LOG = Logger.getLogger(TweeIDSource.class.getName());
+public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> {
+  private static final Logger LOG = Logger.getLogger(TweetIdDateSource.class.getName());
 
-  private Queue<TweetTextReader> readers;
+  private Queue<TweetIdDateReader> readers;
   private TSetContext ctx;
   private String inputDir;
-  private TweetTextReader currentReader;
+  private TweetIdDateReader currentReader;
 
   @Override
   public void prepare(TSetContext context) {
@@ -47,7 +48,7 @@ class TweeIDSource implements SourceFunc<Tuple<BigInteger, String>> {
       StringBuilder files = new StringBuilder();
       while (i < context.getParallelism()) {
         final String fileName = inputDir + "/" + inputFiles.get(i);
-        readers.offer(new TweetTextReader(fileName, context.getConfig(), separator));
+        readers.offer(new TweetIdDateReader(fileName, context.getConfig(), separator));
         files.append(fileName).append(" ");
         i += context.getParallelism();
       }

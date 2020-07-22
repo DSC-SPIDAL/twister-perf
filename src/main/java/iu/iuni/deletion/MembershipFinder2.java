@@ -24,8 +24,8 @@ import edu.iu.dsc.tws.tset.fn.HashingPartitioner;
 import edu.iu.dsc.tws.tset.sets.batch.CachedTSet;
 import edu.iu.dsc.tws.tset.sets.batch.KeyedSourceTSet;
 import edu.iu.dsc.tws.tset.sets.batch.SinkTSet;
+import iu.iuni.deletion.io.TweetIdDateReader;
 import iu.iuni.deletion.io.TweetIdReader;
-import iu.iuni.deletion.io.TweetTextReader;
 import iu.iuni.deletion.io.TweetWriter;
 
 import java.io.IOException;
@@ -173,10 +173,10 @@ public class MembershipFinder2 implements Twister2Worker, Serializable {
   }
 
   private static class TweetIdSource implements SourceFunc<Tuple<String, BigInteger>> {
-    private Queue<TweetTextReader> readers;
+    private Queue<TweetIdDateReader> readers;
     private TSetContext ctx;
     private String inputDir;
-    private TweetTextReader currentReader;
+    private TweetIdDateReader currentReader;
     private int count = 0;
     private int tweetCount = 0;
     private Set<BigInteger> inputMap = new HashSet<>();
@@ -224,7 +224,7 @@ public class MembershipFinder2 implements Twister2Worker, Serializable {
         StringBuilder files = new StringBuilder();
         for (String s : inputFiles) {
           final String fileName = inputDir + "/" + s;
-          readers.offer(new TweetTextReader(fileName, context.getConfig(), "\\s+"));
+          readers.offer(new TweetIdDateReader(fileName, context.getConfig(), "\\s+"));
           files.append(fileName).append(" ");
         }
         LOG.log(Level.INFO, String.format("input file list %s", files.toString()));

@@ -22,7 +22,7 @@ import edu.iu.dsc.tws.tset.sets.batch.CachedTSet;
 import edu.iu.dsc.tws.tset.sets.batch.SinkTSet;
 import edu.iu.dsc.tws.tset.sets.batch.SourceTSet;
 import iu.iuni.deletion.io.TweetIdReader;
-import iu.iuni.deletion.io.TweetTextReader;
+import iu.iuni.deletion.io.TweetIdDateReader;
 import iu.iuni.deletion.io.TweetWriter;
 
 import java.io.IOException;
@@ -197,10 +197,10 @@ public class MembershipFinder implements Twister2Worker, Serializable {
   }
 
   private static class TweetIdSource implements SourceFunc<Tuple<BigInteger, String>> {
-    private Queue<TweetTextReader> readers;
+    private Queue<TweetIdDateReader> readers;
     private TSetContext ctx;
     private String inputDir;
-    private TweetTextReader currentReader;
+    private TweetIdDateReader currentReader;
     private int count = 0;
 
     @Override
@@ -227,7 +227,7 @@ public class MembershipFinder implements Twister2Worker, Serializable {
         StringBuilder files = new StringBuilder();
         for (String s : inputFiles) {
           final String fileName = inputDir + "/" + s;
-          readers.offer(new TweetTextReader(fileName, context.getConfig(), "\\s+"));
+          readers.offer(new TweetIdDateReader(fileName, context.getConfig(), "\\s+"));
           files.append(fileName).append(" ");
         }
         LOG.log(Level.INFO, String.format("input file list %s", files.toString()));
