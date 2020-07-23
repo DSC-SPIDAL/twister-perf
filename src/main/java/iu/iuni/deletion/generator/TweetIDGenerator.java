@@ -29,13 +29,13 @@ public class TweetIDGenerator implements IWorker {
                       IPersistentVolume persistentVolume,
                       IVolatileVolume volatileVolume) {
     int workerID = workerController.getWorkerInfo().getWorkerID();
+    int numberOfWorkers = workerController.getNumberOfWorkers();
 
-    String prefix = config.getStringValue(Context.ARG_OUTPUT_DIRECTORY);
+    String outputDir = config.getStringValue(Context.ARG_OUTPUT_DIRECTORY);
     boolean csv = true;
     int records = config.getIntegerValue(Context.ARG_TUPLES);
     try {
-      String data = csv ? "csv" : "";
-      TweetWriter outputWriter = new TweetWriter(prefix + "/tweet/input-" + workerID, config);
+      TweetWriter outputWriter = new TweetWriter(outputDir + "/tweet/input-" + workerID, config);
       BigInteger start = new BigInteger("1000000000000000000").multiply(new BigInteger("" + (workerID + 1)));
       // now write 1000,000
       StringBuilder builder = new StringBuilder();
@@ -56,10 +56,13 @@ public class TweetIDGenerator implements IWorker {
       }
       outputWriter.close();
 
-      TweetWriter outputWriter2 = new TweetWriter(prefix + "/delete/input-" + workerID, config);
+      TweetWriter outputWriter2 = new TweetWriter(outputDir + "/delete/input-" + workerID, config);
       BigInteger start2 = new BigInteger("1000000000000000000").multiply(new BigInteger("" + (workerID + 1)));
-      // now write 1000,000
-      for (int i = 0; i < 1000000; i++) {
+
+      int step = numberOfWorkers * 3 / 2;
+      step = step % 2 == 0 ? step + 1 : step;
+
+      for (int i = 0; i < records * 3 / 2; i += step) {
         BigInteger bi = start2.add(new BigInteger(i + ""));
         if (csv) {
           outputWriter2.write(bi.toString());
@@ -98,14 +101,14 @@ public class TweetIDGenerator implements IWorker {
   public static void main(String[] args) {
 
     Config config = ResourceAllocator.loadConfig(new HashMap<>());
-    String filePrefix = args[0];
+    String outputDir = args[0];
     int parallel = Integer.parseInt(args[1]);
     int memory = Integer.parseInt(args[2]);
     int tuples = Integer.parseInt(args[3]);
 
     JobConfig jobConfig = new JobConfig();
 
-    jobConfig.put(Context.ARG_OUTPUT_DIRECTORY, filePrefix);
+    jobConfig.put(Context.ARG_OUTPUT_DIRECTORY, outputDir);
     jobConfig.put(Context.ARG_TUPLES, tuples);
 
     Twister2Job twister2Job;

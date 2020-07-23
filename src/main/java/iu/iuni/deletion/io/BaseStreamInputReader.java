@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class BaseStreamInputReader<K> implements FileReader {
-  private static final Logger LOG = Logger.getLogger(StreamInputReader.class.getName());
+  private static final Logger LOG = Logger.getLogger(BaseStreamInputReader.class.getName());
 
   private BufferedReader in;
 

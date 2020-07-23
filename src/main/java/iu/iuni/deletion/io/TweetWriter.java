@@ -25,9 +25,9 @@ public class TweetWriter {
   public TweetWriter(String fileName, Config config) throws FileNotFoundException {
     try {
       FileSystem fs = FileSystemUtils.get(new Path(fileName).toUri(), config);
-      this.out = fs.create(new Path(fileName), FileSystem.WriteMode.NO_OVERWRITE);
+      this.out = fs.create(new Path(fileName), FileSystem.WriteMode.OVERWRITE);
     } catch (IOException e) {
-      LOG.log(Level.SEVERE, "Failed to create file system - " + fileName, e);
+      LOG.log(Level.SEVERE, "Failed to create the file system - " + fileName, e);
       throw new RuntimeException("Failed to create file", e);
     }
   }
