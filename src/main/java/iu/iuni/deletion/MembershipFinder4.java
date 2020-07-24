@@ -45,10 +45,10 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
 
     // read the delete input files, partition and cache them
-    PersistedTSet<BigInteger> persistedDeleteIDs = batchEnv
+    CachedTSet<BigInteger> cachedDeleteIDs = batchEnv
         .createSource(new TweetIDSource(), parallel)
         .partition(new HashingPartitioner<>())
-        .persist();
+        .cache();
 
     // read tweet ID-date files, partition them and persist them
     KeyedPersistedTSet<BigInteger, String> persistedTweets =
@@ -58,7 +58,7 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
 
     // write to log to check things
     LOG.info("........... Persisted delete keys ........");
-    persistedDeleteIDs.pipe().forEach(data -> LOG.info(data.toString()));
+    cachedDeleteIDs.pipe().forEach(data -> LOG.info(data.toString()));
 
     LOG.info("........... Persisted tweetID-date pairs ........");
     persistedTweets.keyedPipe().forEach(data -> LOG.info(data.getKey() + ": " + data.getValue()));
@@ -68,8 +68,8 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
         persistedTweets
             .keyedDirect()
             .compute(new ComputeMatchingTweets())
-            .addInput("delete-input", persistedDeleteIDs)
-            .direct()
+            .addInput("delete-input", cachedDeleteIDs)
+            .pipe()
             .cache();
     // keyedPipe does not work here????
     //    persistedTweets.keyedPipe().compute(computeMatchingTweets)
