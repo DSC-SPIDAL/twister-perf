@@ -26,6 +26,13 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * each worker reads two source files:
+ *    one with (tweetID - date) pairs, the other is with delete tweet IDs
+ * both Tsets are partitioned with hash partitioner
+ * each worker writes matching tweet IDs to hdfs
+ */
+
 public class MembershipFinder3 implements Twister2Worker, Serializable {
   private static final Logger LOG = Logger.getLogger(MembershipFinder3.class.getName());
 
