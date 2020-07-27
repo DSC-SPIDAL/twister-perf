@@ -24,61 +24,41 @@ import java.util.logging.Logger;
 public class TweetIDSource implements SourceFunc<BigInteger> {
   private static final Logger LOG = Logger.getLogger(TweetIDSource.class.getName());
 
-  private Queue<TweetIdReader> readers;
-  private String inputDir;
+  private String inputFile;
   private TweetIdReader currentReader;
-  private int count = 0;
 
   @Override
   public void prepare(TSetContext context) {
-    inputDir = context.getConfig().getStringValue(Context.ARG_DELETE_INPUT_DIRECTORY);
-    readers = new LinkedList<>();
+    String inputDir = context.getConfig().getStringValue(Context.ARG_DELETE_INPUT_DIRECTORY);
     try {
-      List<String> inputFiles = new ArrayList<>();
       FileSystem fs = FileSystemUtils.get(new Path(inputDir).toUri(), context.getConfig());
       FileStatus[] fileStatuses = fs.listFiles(new Path(inputDir));
       for (FileStatus s : fileStatuses) {
-        inputFiles.add(s.getPath().getName());
-      }
-      inputFiles.sort(new Comparator<String>() {
-        @Override
-        public int compare(String s, String t1) {
-          return s.compareTo(t1);
+        if (s.getPath().getName().endsWith("-" + context.getWorkerId())) {
+          inputFile = inputDir + "/" + s.getPath().getName();
+          currentReader = new TweetIdReader(inputFile, context.getConfig(), ",");
         }
-      });
-
-      int i = context.getIndex();
-      StringBuilder files = new StringBuilder();
-      while (i < context.getParallelism()) {
-        final String fileName = inputDir + "/" + inputFiles.get(i);
-        readers.offer(new TweetIdReader(fileName, context.getConfig(), ","));
-        files.append(fileName).append(" ");
-        i += context.getParallelism();
       }
-      LOG.log(Level.INFO, String.format("input file list %s", files.toString()));
+
+      if (currentReader == null) {
+        throw new RuntimeException("There is no input file ending with workerID: -" + context.getWorkerId());
+      }
+
     } catch (IOException e) {
       LOG.log(Level.INFO, "There is an exception", e);
       throw new RuntimeException("There is an exception", e);
     }
-    // lets get all the files, sort them and assign accordingly
-    currentReader = readers.poll();
   }
 
   @Override
   public boolean hasNext() {
     try {
-      do {
-        boolean b = currentReader.reachedEnd();
-        if (b) {
-          LOG.info("Done reading from file - " + currentReader.getFileName().getPath());
-          currentReader = readers.poll();
-        } else {
-          return true;
-        }
-      } while (currentReader != null);
-
-      LOG.info("READ DELETE TUPLES " + count);
-      return false;
+      if (currentReader.reachedEnd()) {
+        LOG.info("Done reading from the input file: " + inputFile);
+        return false;
+      } else {
+        return true;
+      }
     } catch (Exception e) {
       throw new RuntimeException("Failed to read", e);
     }
@@ -87,10 +67,10 @@ public class TweetIDSource implements SourceFunc<BigInteger> {
   @Override
   public BigInteger next() {
     try {
-      count++;
       return currentReader.nextRecord();
     } catch (Exception e) {
       throw new RuntimeException("Failed to read next", e);
     }
   }
 }
+

@@ -51,7 +51,7 @@ public class TweetIDPartitionJob implements Twister2Worker, Serializable {
     jobConfig.put(Context.ARG_MEMORY, memory);
     jobConfig.put(Context.ARG_SEPARATOR, "\\s+");
     jobConfig.put(Context.ARG_DATE, date);
-    jobConfig.put(Context.ARG_TUPLES, tupes);
+    jobConfig.put(Context.ARG_TUPLES_PER_WORKER, tupes);
 
     Twister2Job twister2Job = Twister2Job.newBuilder()
         .setJobName(TweetIDPartitionJob.class.getName())
@@ -177,7 +177,7 @@ public class TweetIDPartitionJob implements Twister2Worker, Serializable {
     public boolean add(Iterator<Tuple<BigInteger, String>> value) {
       LOG.info("Starting to write: ");
       int count = 0;
-      int tupes = context.getConfig().getIntegerValue(Context.ARG_TUPLES);
+      int tupes = context.getConfig().getIntegerValue(Context.ARG_TUPLES_PER_WORKER);
       TweetWriter writer;
       try {
         writer = new TweetWriter(outDir + "/partitioned/" + context.getIndex() + "/" + date + "-" + count, context.getConfig());

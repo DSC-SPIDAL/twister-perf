@@ -33,14 +33,14 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
       LOG.info("number of files: " + fileStatuses.length);
 
       for (FileStatus s : fileStatuses) {
-        if (s.getPath().getName().endsWith(context.getWorkerId() + "")) {
+        if (s.getPath().getName().endsWith("-" + context.getWorkerId())) {
           inputFile = inputDir + "/" + s.getPath().getName();
           currentReader = new TweetIdDateReader(inputFile, context.getConfig(), separator);
         }
       }
 
       if (currentReader == null) {
-        throw new RuntimeException("There is no input file ending with workerID: " + context.getWorkerId());
+        throw new RuntimeException("There is no input file ending with workerID: -" + context.getWorkerId());
       }
 
     } catch (IOException e) {

@@ -67,6 +67,7 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     CachedTSet<Tuple<String, BigInteger>> cachedMatchedTweets =
         persistedTweets
             .keyedDirect()
+            .useDisk()
             .compute(new ComputeMatchingTweets())
             .addInput("delete-input", cachedDeleteIDs)
             .pipe()

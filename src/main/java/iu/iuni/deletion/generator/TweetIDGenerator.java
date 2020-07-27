@@ -15,7 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
@@ -32,43 +31,43 @@ public class TweetIDGenerator implements IWorker {
     int numberOfWorkers = workerController.getNumberOfWorkers();
 
     String outputDir = config.getStringValue(Context.ARG_OUTPUT_DIRECTORY);
-    boolean csv = true;
-    int records = config.getIntegerValue(Context.ARG_TUPLES);
+    int recordsPerWorker = config.getIntegerValue(Context.ARG_TUPLES_PER_WORKER);
     try {
       TweetWriter outputWriter = new TweetWriter(outputDir + "/tweet/input-" + workerID, config);
       BigInteger start = new BigInteger("1000000000000000000").multiply(new BigInteger("" + (workerID + 1)));
       // now write 1000,000
       StringBuilder builder = new StringBuilder();
-      for (int i = 0; i < records; i++) {
+      for (int i = 0; i < recordsPerWorker; i++) {
         BigInteger bi = start.add(new BigInteger(i + ""));
-        if (i % 1000000 == 0) {
+        if (i > 0 && i % 1000000 == 0) {
           LOG.info("Wrote elements: " + i);
         }
-        builder.append(bi.toString()).append("\t").append(between("2017-01-01", "2019-12-31")).append("\n");
-        if (i > 0 && (i % 10000 == 0 || i == records - 1)) {
-          if (csv) {
-            outputWriter.writeWithoutEnd(builder.toString());
-            builder = new StringBuilder();
-          } else {
-            outputWriter.write(bi, (long) workerID);
-          }
+        builder.append(bi.toString())
+            .append("\t")
+            .append(between("2017-01-01", "2019-12-31"))
+            .append("\n");
+
+        if (i > 0 && (i % 10000 == 0 || i == recordsPerWorker - 1)) {
+          outputWriter.writeWithoutEnd(builder.toString());
+          // clear StringBuilder
+          builder.setLength(0);
         }
       }
       outputWriter.close();
 
       TweetWriter outputWriter2 = new TweetWriter(outputDir + "/delete/input-" + workerID, config);
       BigInteger start2 = new BigInteger("1000000000000000000").multiply(new BigInteger("" + (workerID + 1)));
+      int numberOfDeleteIDsPerWorker = config.getIntegerValue(Context.ARG_NUMBER_OF_DELETE_IDS_PER_WORKER);
 
-      int step = numberOfWorkers * 3 / 2;
-      step = step % 2 == 0 ? step + 1 : step;
+      // the ratio of delete IDs that matches deleteID-data pairs generated at above section
+      double matchingRatio = 0.5;
+      int step = (int) Math.round (recordsPerWorker / (matchingRatio * numberOfDeleteIDsPerWorker));
 
-      for (int i = 0; i < records * 3 / 2; i += step) {
-        BigInteger bi = start2.add(new BigInteger(i + ""));
-        if (csv) {
-          outputWriter2.write(bi.toString());
-        } else {
-          outputWriter2.write(bi, (long) workerID);
-        }
+      int deleteID = 0;
+      for (int i = 0; i < numberOfDeleteIDsPerWorker; i++) {
+        BigInteger bi = start2.add(new BigInteger(deleteID + ""));
+        outputWriter2.write(bi.toString());
+        deleteID += step;
       }
       outputWriter2.close();
     } catch (Exception e) {
@@ -104,12 +103,14 @@ public class TweetIDGenerator implements IWorker {
     String outputDir = args[0];
     int parallel = Integer.parseInt(args[1]);
     int memory = Integer.parseInt(args[2]);
-    int tuples = Integer.parseInt(args[3]);
+    int tuplesPerWorker = Integer.parseInt(args[3]);
+    int numberOfDeleteIDsPerWorker = Integer.parseInt(args[4]);
 
     JobConfig jobConfig = new JobConfig();
 
     jobConfig.put(Context.ARG_OUTPUT_DIRECTORY, outputDir);
-    jobConfig.put(Context.ARG_TUPLES, tuples);
+    jobConfig.put(Context.ARG_TUPLES_PER_WORKER, tuplesPerWorker);
+    jobConfig.put(Context.ARG_NUMBER_OF_DELETE_IDS_PER_WORKER, numberOfDeleteIDsPerWorker);
 
     Twister2Job twister2Job;
     twister2Job = Twister2Job.newBuilder()
