@@ -30,8 +30,6 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
       FileSystem fs = FileSystemUtils.get(new Path(inputDir).toUri(), context.getConfig());
       FileStatus[] fileStatuses = fs.listFiles(new Path(inputDir));
 
-      LOG.info("number of files: " + fileStatuses.length);
-
       for (FileStatus s : fileStatuses) {
         if (s.getPath().getName().endsWith("-" + context.getWorkerId())) {
           inputFile = inputDir + "/" + s.getPath().getName();

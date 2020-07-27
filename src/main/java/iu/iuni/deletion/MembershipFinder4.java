@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 
 public class MembershipFinder4 implements Twister2Worker, Serializable {
-  private static final Logger LOG = Logger.getLogger(MembershipFinder3.class.getName());
+  private static final Logger LOG = Logger.getLogger(MembershipFinder4.class.getName());
 
   @Override
   public void execute(WorkerEnvironment workerEnv) {
@@ -50,18 +50,18 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
         .partition(new HashingPartitioner<>())
         .cache();
 
+    // write to log to check things
+    LOG.info("........... cached delete keys ........");
+    // cachedDeleteIDs.pipe().forEach(data -> LOG.info(data.toString()));
+
     // read tweet ID-date files, partition them and persist them
     KeyedPersistedTSet<BigInteger, String> persistedTweets =
         batchEnv.createKeyedSource(new TweetIdDateSource(), parallel)
             .keyedGatherUngrouped(new HashingPartitioner<>())
             .persist();
 
-    // write to log to check things
-    LOG.info("........... Persisted delete keys ........");
-    cachedDeleteIDs.pipe().forEach(data -> LOG.info(data.toString()));
-
     LOG.info("........... Persisted tweetID-date pairs ........");
-    persistedTweets.keyedPipe().forEach(data -> LOG.info(data.getKey() + ": " + data.getValue()));
+    // persistedTweets.keyedPipe().forEach(data -> LOG.info(data.getKey() + ": " + data.getValue()));
 
     // calculate matched tweetID-date pairs
     CachedTSet<Tuple<String, BigInteger>> cachedMatchedTweets =
