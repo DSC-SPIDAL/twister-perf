@@ -14,6 +14,6 @@ public class TweetIdReader extends BaseStreamInputReader<BigInteger> {
 
   @Override
   public BigInteger nextRecord() {
-    return new BigInteger(currentSize);
+    return new BigInteger(currentLine);
   }
 }

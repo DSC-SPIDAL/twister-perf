@@ -17,7 +17,7 @@ public abstract class BaseStreamInputReader<K> implements FileReader {
 
   private BufferedReader in;
 
-  protected String currentSize;
+  protected String currentLine;
 
   private boolean end = false;
 
@@ -47,8 +47,9 @@ public abstract class BaseStreamInputReader<K> implements FileReader {
 
   public boolean reachedEnd() throws IOException {
     try {
-      currentSize = in.readLine();
-      if (currentSize == null) {
+      currentLine = in.readLine();
+      if (currentLine == null) {
+        in.close();
         end = true;
       }
       count++;

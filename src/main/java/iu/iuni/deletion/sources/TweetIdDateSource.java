@@ -21,6 +21,7 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
 
   private String inputFile;
   private TweetIdDateReader currentReader;
+  private long count = 0;
 
   @Override
   public void prepare(TSetContext context) {
@@ -34,6 +35,8 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
         if (s.getPath().getName().endsWith("-" + context.getWorkerId())) {
           inputFile = inputDir + "/" + s.getPath().getName();
           currentReader = new TweetIdDateReader(inputFile, context.getConfig(), separator);
+          LOG.info("Starting to read: " + inputFile);
+          break;
         }
       }
 
@@ -51,7 +54,7 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
   public boolean hasNext() {
     try {
       if (currentReader.reachedEnd()) {
-        LOG.info("Done reading from the input file: " + inputFile);
+        LOG.info("Done reading the input file: " + inputFile);
         return false;
       } else {
         return true;
@@ -64,6 +67,11 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
   @Override
   public Tuple<BigInteger, String> next() {
     try {
+      count++;
+      if (count > 0 && count % 10000000 == 0) {
+        LOG.info("has read: " + (count / 1000000) + "M tweetID-date pairs.");
+      }
+
       return currentReader.nextRecord();
     } catch (Exception e) {
       throw new RuntimeException("Failed to read next", e);

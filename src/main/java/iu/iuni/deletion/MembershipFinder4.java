@@ -66,14 +66,11 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     // calculate matched tweetID-date pairs
     CachedTSet<Tuple<String, BigInteger>> cachedMatchedTweets =
         persistedTweets
-            .keyedDirect()
-            .useDisk()
+            .keyedPipe()
             .compute(new ComputeMatchingTweets())
             .addInput("delete-input", cachedDeleteIDs)
             .pipe()
             .cache();
-    // keyedPipe does not work here????
-    //    persistedTweets.keyedPipe().compute(computeMatchingTweets)
     // how can we make cachedMatchedTweets key-value pairs? do we have to use mapToTuple as below?
 
     LOG.info("........... Matched tweets: gathering ........");
@@ -88,7 +85,7 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     LOG.info("........... Done. Exiting....");
   }
 
-  private class ComputeMatchingTweets extends BaseComputeCollectorFunc<Tuple<String, BigInteger>, Iterator<Tuple<BigInteger, String>>> {
+  private class ComputeMatchingTweets extends BaseComputeCollectorFunc<Tuple<String, BigInteger>, Tuple<BigInteger, String>> {
 
     private TSetContext ctx;
     private Set<BigInteger> deleteSet = new TreeSet<>();
@@ -110,13 +107,10 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     }
 
     @Override
-    public void compute(Iterator<Tuple<BigInteger, String>> input, RecordCollector<Tuple<String, BigInteger>> output) {
+    public void compute(Tuple<BigInteger, String> input, RecordCollector<Tuple<String, BigInteger>> output) {
 
-      while (input.hasNext()) {
-        Tuple<BigInteger, String> nxt = input.next();
-        if (deleteSet.contains(nxt.getKey())) {
-          output.collect(new Tuple<>(nxt.getValue(), nxt.getKey()));
-        }
+      if (deleteSet.contains(input.getKey())) {
+        output.collect(new Tuple<>(input.getValue(), input.getKey()));
       }
     }
   }

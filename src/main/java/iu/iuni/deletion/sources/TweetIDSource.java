@@ -37,6 +37,7 @@ public class TweetIDSource implements SourceFunc<BigInteger> {
         if (s.getPath().getName().endsWith("-" + context.getWorkerId())) {
           inputFile = inputDir + "/" + s.getPath().getName();
           currentReader = new TweetIdReader(inputFile, context.getConfig(), ",");
+          break;
         }
       }
 
@@ -54,7 +55,7 @@ public class TweetIDSource implements SourceFunc<BigInteger> {
   public boolean hasNext() {
     try {
       if (currentReader.reachedEnd()) {
-        LOG.info("Done reading from the input file: " + inputFile);
+        LOG.info("Done reading the input file: " + inputFile);
         return false;
       } else {
         return true;
