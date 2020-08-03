@@ -45,10 +45,10 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
 
     // read the delete input files, partition and cache them
-    CachedTSet<BigInteger> cachedDeleteIDs = batchEnv
+    PersistedTSet<BigInteger> cachedDeleteIDs = batchEnv
         .createSource(new TweetIDSource(), parallel)
         .partition(new HashingPartitioner<>())
-        .cache();
+        .persist();
 
     // write to log to check things
     LOG.info("........... cached delete keys ........");

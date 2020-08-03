@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public abstract class BaseStreamInputReader<K> implements FileReader {
   private static final Logger LOG = Logger.getLogger(BaseStreamInputReader.class.getName());
 
-  private BufferedReader in;
+  protected BufferedReader in;
 
   protected String currentLine;
 

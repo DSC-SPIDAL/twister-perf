@@ -56,6 +56,10 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
       if (currentReader.reachedEnd()) {
         LOG.info("Done reading the input file: " + inputFile);
         return false;
+      } else if (count >= 10000000) {
+        LOG.info("Has read 10M tuples. Done reading the input file: " + inputFile);
+        currentReader.closeReader();
+        return false;
       } else {
         return true;
       }
@@ -68,9 +72,9 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
   public Tuple<BigInteger, String> next() {
     try {
       count++;
-      if (count > 0 && count % 10000000 == 0) {
-        LOG.info("has read: " + (count / 1000000) + "M tweetID-date pairs.");
-      }
+//      if (count > 0 && count % 10000000 == 0) {
+//        LOG.info("has read: " + (count / 1000000) + "M tweetID-date pairs.");
+//      }
 
       return currentReader.nextRecord();
     } catch (Exception e) {
