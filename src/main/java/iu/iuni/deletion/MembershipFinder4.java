@@ -45,13 +45,13 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
 
     // read the delete input files, partition and cache them
-    PersistedTSet<BigInteger> cachedDeleteIDs = batchEnv
+    PersistedTSet<BigInteger> persistedDeleteIDs = batchEnv
         .createSource(new TweetIDSource(), parallel)
         .partition(new HashingPartitioner<>())
         .persist();
 
     // write to log to check things
-    LOG.info("........... cached delete keys ........");
+    LOG.info("........... persisted delete keys ........");
     // cachedDeleteIDs.pipe().forEach(data -> LOG.info(data.toString()));
 
     // read tweet ID-date files, partition them and persist them
@@ -68,7 +68,7 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
         persistedTweets
             .keyedPipe()
             .compute(new ComputeMatchingTweets())
-            .addInput("delete-input", cachedDeleteIDs)
+            .addInput("delete-input", persistedDeleteIDs)
             .pipe()
             .cache();
     // how can we make cachedMatchedTweets key-value pairs? do we have to use mapToTuple as below?
