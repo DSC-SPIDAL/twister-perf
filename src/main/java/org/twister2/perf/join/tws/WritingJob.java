@@ -11,6 +11,7 @@ import edu.iu.dsc.tws.api.resource.IVolatileVolume;
 import edu.iu.dsc.tws.api.resource.IWorker;
 import edu.iu.dsc.tws.api.resource.IWorkerController;
 import edu.iu.dsc.tws.data.utils.FileSystemUtils;
+import edu.iu.dsc.tws.proto.system.job.JobAPI;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
 import org.twister2.perf.shuffle.Context;
@@ -50,7 +51,12 @@ public class WritingJob implements IWorker {
   }
 
   @Override
-  public void execute(Config config, int workerID, IWorkerController workerController, IPersistentVolume persistentVolume, IVolatileVolume volatileVolume) {
+  public void execute(Config config,
+                      JobAPI.Job job,
+                      IWorkerController workerController,
+                      IPersistentVolume persistentVolume,
+                      IVolatileVolume volatileVolume) {
+    int workerID = workerController.getWorkerInfo().getWorkerID();
     long recordsPerRelation = config.getLongValue(Context.ARG_TUPLES, 1000);
     String fileName = config.getStringValue(Context.ARG_FILE_PREFIX);
     long workers = config.getLongValue("WORKERS", 80);

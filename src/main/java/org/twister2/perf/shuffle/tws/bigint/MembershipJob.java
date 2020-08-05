@@ -11,7 +11,8 @@ import edu.iu.dsc.tws.api.tset.TSetContext;
 import edu.iu.dsc.tws.api.tset.fn.*;
 import edu.iu.dsc.tws.rsched.core.ResourceAllocator;
 import edu.iu.dsc.tws.rsched.job.Twister2Submitter;
-import edu.iu.dsc.tws.tset.env.BatchTSetEnvironment;
+import edu.iu.dsc.tws.tset.env.BatchEnvironment;
+import edu.iu.dsc.tws.tset.env.TSetEnvironment;
 import edu.iu.dsc.tws.tset.sets.batch.CachedTSet;
 import edu.iu.dsc.tws.tset.sets.batch.SinkTSet;
 import edu.iu.dsc.tws.tset.sets.batch.SourceTSet;
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
 /**
  * Finding the membership
  */
-public class MembershipJob implements IWorker, Serializable {
+public class MembershipJob implements Twister2Worker, Serializable {
   private static final Logger LOG = Logger.getLogger(MembershipJob.class.getName());
 
   public static void main(String[] args) {
@@ -56,12 +57,9 @@ public class MembershipJob implements IWorker, Serializable {
   }
 
   @Override
-  public void execute(Config config, int workerID,
-                      IWorkerController workerController,
-                      IPersistentVolume persistentVolume,
-                      IVolatileVolume volatileVolume) {
-    BatchTSetEnvironment batchEnv = BatchTSetEnvironment.initBatch(WorkerEnvironment.init(
-        config, workerID, workerController, persistentVolume, volatileVolume));
+  public void execute(WorkerEnvironment workerEnvironment) {
+    BatchEnvironment batchEnv = TSetEnvironment.initBatch(workerEnvironment);
+    Config config = workerEnvironment.getConfig();
 
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
     // now lets read the second input file and cache it
