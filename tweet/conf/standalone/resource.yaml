@@ -1,0 +1,59 @@
+# working directory
+twister2.resource.scheduler.mpi.working.directory: "${HOME}/.twister2/jobs"
+
+# mode of the mpi scheduler
+twsiter2.resource.scheduler.mpi.mode: "standalone"
+
+# the job id file
+twister2.resource.scheduler.mpi.job.id: ""
+
+# mpi worker script to run
+twister2.resource.scheduler.mpi.shell.script: "mpiworker.sh"
+
+# the mpirun command location
+twister2.resource.scheduler.mpi.home: ""
+
+# the package uri
+twister2.resource.system.package.uri: "${TWISTER2_DIST}/twister2-core-0.8.0-SNAPSHOT.tar.gz"
+
+# the launcher class
+twister2.resource.class.launcher: "edu.iu.dsc.tws.rsched.schedulers.standalone.MPILauncher"
+
+# mpi run file, this assumes a mpirun that is shipped with the product
+# change this to just mpirun if you are using a system wide installation of OpenMPI
+# or complete path of OpenMPI in case you have something custom
+# twister2.resource.scheduler.mpi.mpirun.file: "ompi/bin/mpirun"
+twister2.resource.scheduler.mpi.mpirun.file: "/N/u/auyar/openmpi-4.0.2/build/bin/mpirun"
+
+# mpi scheduling policy. Two possible options are node and slot.
+# read more at https://www.open-mpi.org/faq/?category=running#mpirun-scheduling
+twister2.resource.scheduler.mpi.mapby: "node"
+
+# use mpi map-by modifier PE. If this option is enabled, cpu count of compute resource
+# specified in job definition will be taken into consideration
+twister2.resource.scheduler.mpi.mapby.use-pe: false
+
+# Indicates whether bootstrap process needs to be run and distribute job file and core
+# between nodes. Twister2 assumes job file is accessible to all nodes if this property is set
+# to true, else it will run the bootstrap process
+twister2.resource.sharedfs: true
+
+# Directory for file system volume mount
+twister2.resource.fs.mount: "${TWISTER2_HOME}/persistent/fs/"
+
+# the uploader directory
+twister2.resource.uploader.directory: "${HOME}/.twister2/repository"
+
+# the uplaoder class
+twister2.resource.class.uploader: "edu.iu.dsc.tws.rsched.uploaders.localfs.LocalFileSystemUploader"
+
+# this is the method that workers use to download the core and job packages
+# it could be  HTTP, HDFS, ..
+twister2.resource.uploader.download.method: "HTTP"
+
+# OpenMPI parameters:
+# -np, --hostfile and --mapby are specified by Twister2
+# you can specify other OpenMPI parameters that will be provided in mpirun command
+# for example:
+#    twister2.resource.scheduler.mpi.params: '--mca btl vader,self'
+twister2.resource.scheduler.mpi.params: '--mca btl_openib_allow_ib 1'

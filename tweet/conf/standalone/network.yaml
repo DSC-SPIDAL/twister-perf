@@ -1,0 +1,2 @@
+twister2.network.channel.class: "edu.iu.dsc.tws.comms.mpi.TWSMPIChannel"
+
