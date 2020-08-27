@@ -85,7 +85,7 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     LOG.info("........... Done. Exiting....");
   }
 
-  private class ComputeMatchingTweets extends BaseComputeCollectorFunc<Tuple<String, BigInteger>, Tuple<BigInteger, String>> {
+  private class ComputeMatchingTweets extends BaseComputeCollectorFunc<Tuple<BigInteger, String>, Tuple<String, BigInteger>> {
 
     private TSetContext ctx;
     private Set<BigInteger> deleteSet = new TreeSet<>();

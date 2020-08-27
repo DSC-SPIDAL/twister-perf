@@ -68,11 +68,11 @@ public class JoinJob implements Twister2Worker, Serializable {
 
     KeyedSourceTSet<Integer, Long> source1 = env.createKeyedHadoopSource(configuration1,
         KeyValueTextInputFormat.class, parallelism,
-        (MapFunc<Tuple<Integer, Long>, Tuple<Text, Text>>) input ->
+        (MapFunc<Tuple<Text, Text>, Tuple<Integer, Long>>) input ->
             Tuple.of(Integer.parseInt(input.getKey().toString()), Long.parseLong(input.getValue().toString()))).withSchema(schema);
 
     KeyedSourceTSet<Integer, Long> source2 = env.createKeyedHadoopSource(configuration2,
-        KeyValueTextInputFormat.class, parallelism, (MapFunc<Tuple<Integer, Long>, Tuple<Text, Text>>) input ->
+        KeyValueTextInputFormat.class, parallelism, (MapFunc<Tuple<Text, Text>, Tuple<Integer, Long>>) input ->
             Tuple.of(Integer.parseInt(input.getKey().toString()), Long.parseLong(input.getValue().toString()))).withSchema(schema);
 
     LOG.info("Joining...");

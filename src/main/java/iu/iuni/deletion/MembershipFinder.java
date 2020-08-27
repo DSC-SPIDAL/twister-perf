@@ -90,7 +90,7 @@ public class MembershipFinder implements Twister2Worker, Serializable {
     SinkTSet<Iterator<Tuple<String, BigInteger>>> sink = inputRecords
         .direct()
         .useDisk()
-        .flatmap(new FlatMapFunc<Tuple<String, BigInteger>, Tuple<BigInteger, String>>() {
+        .flatmap(new FlatMapFunc<Tuple<BigInteger, String>, Tuple<String, BigInteger>>() {
 
           Set<BigInteger> inputMap = new HashSet<>();
           TSetContext context;

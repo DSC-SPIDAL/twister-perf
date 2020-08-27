@@ -129,7 +129,7 @@ public class MembershipJob implements Twister2Worker, Serializable {
       }
     }, parallel);
 
-    SinkTSet<Iterator<String>> sink = inputRecords.direct().flatmap(new FlatMapFunc<String, Tuple<BigInteger, Long>>() {
+    SinkTSet<Iterator<String>> sink = inputRecords.direct().flatmap(new FlatMapFunc<Tuple<BigInteger, Long>, String>() {
       Map<String, Long> inputMap = new HashMap<>();
 
       TSetContext context;
