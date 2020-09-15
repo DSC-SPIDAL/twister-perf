@@ -34,7 +34,7 @@ twister2.network.message.grouping.size: 20000
 # For disk based operations, this directory list will be used to persist incoming messages.
 # This can be used to balance the load between multiple devices, by specifying directory locations
 # from different devices.
-twister2.network.ops.persistent.dirs: ["/scratch/auyar/terasort"]
+# twister2.network.ops.persistent.dirs: ["/scratch/auyar/terasort"]
 # twister2.network.ops.persistent.dirs: ["/twister2-volatile"]
 # twister2.network.ops.persistent.dirs: ["/dev/shm"]
 
