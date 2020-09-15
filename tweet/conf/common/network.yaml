@@ -46,7 +46,7 @@ twister2.network.shuffle.memory.bytes.max: 102400
 twister2.network.shuffle.memory.records.max: 102400
 
 # size of the shuffle file (10MB default)
-twister2.network.shuffle.file.bytes.max: 1000000
+twister2.network.shuffle.file.bytes.max: 100000000
 
 # no of parallel IO operations permitted
 twister2.network.shuffle.parallel.io: 2
