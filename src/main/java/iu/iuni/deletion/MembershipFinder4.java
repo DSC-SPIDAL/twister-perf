@@ -40,7 +40,7 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
 
   @Override
   public void execute(WorkerEnvironment workerEnv) {
-    BatchEnvironment batchEnv = TSetEnvironment.initBatch(workerEnv);
+    BatchEnvironment batchEnv = TSetEnvironment.initCheckpointing(workerEnv);
     Config config = workerEnv.getConfig();
     int parallel = config.getIntegerValue(Context.ARG_PARALLEL);
 
@@ -58,6 +58,7 @@ public class MembershipFinder4 implements Twister2Worker, Serializable {
     KeyedPersistedTSet<BigInteger, String> persistedTweets =
         batchEnv.createKeyedSource(new TweetIdDateSource(), parallel)
             .keyedGatherUngrouped(new HashingPartitioner<>())
+            .useDisk()
             .persist();
 
     LOG.info("........... Persisted tweetID-date pairs ........");

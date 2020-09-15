@@ -12,7 +12,6 @@ import iu.iuni.deletion.io.TweetIdDateReader;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +21,7 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
   private String inputFile;
   private TweetIdDateReader currentReader;
   private long count = 0;
+  private long MAX_TUPLE_TO_READ = 50000;
 
   @Override
   public void prepare(TSetContext context) {
@@ -54,10 +54,10 @@ public class TweetIdDateSource implements SourceFunc<Tuple<BigInteger, String>> 
   public boolean hasNext() {
     try {
       if (currentReader.reachedEnd()) {
-        LOG.info("Done reading the input file: " + inputFile);
+        LOG.info("Has read " + (count / 1000) + "K tuples. Finished reading the input file: " + inputFile);
         return false;
-      } else if (count >= 10000000) {
-        LOG.info("Has read 10M tuples. Done reading the input file: " + inputFile);
+      } else if (count >= MAX_TUPLE_TO_READ) {
+        LOG.info("Has read " + MAX_TUPLE_TO_READ + " tuples. Done reading the input file: " + inputFile);
         currentReader.closeReader();
         return false;
       } else {
