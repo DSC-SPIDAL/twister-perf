@@ -62,13 +62,14 @@ public class JoinJobRandom {
           .equalTo(ds2.col("key")), "inner").select("ds1.key", "value1", "value2");
     }
     LOG.info("Final total: " + join.count());
-    LOG.info("Time: " + (System.nanoTime() - start) / 1000000);
+
     Dataset<Row> f = join.filter(new FilterFunction<Row>() {
       @Override
       public boolean call(Row row) throws Exception {
         return false;
       }
     });
+    LOG.info("Filter " + f.count() + " Time: " + (System.nanoTime() - start) / 1000000);
     if (args.length > 3) {
       f.write().csv(args[3]);
     } /*else {
