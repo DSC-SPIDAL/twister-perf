@@ -37,12 +37,12 @@ public class LongRecordReader extends RecordReader<Long, Long> {
 
   @Override
   public Long getCurrentKey() throws IOException, InterruptedException {
-    return (long)(random.nextFloat() * range);
+    return (long)(random.nextDouble() * range);
   }
 
   @Override
   public Long getCurrentValue() throws IOException, InterruptedException {
-    return (long)(random.nextFloat() * range);
+    return (long)(random.nextDouble() * range);
   }
 
   @Override
