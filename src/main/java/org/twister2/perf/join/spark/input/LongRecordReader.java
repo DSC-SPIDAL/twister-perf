@@ -7,6 +7,7 @@ import org.apache.spark.SparkEnv;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 public class LongRecordReader extends RecordReader<Long, Long> {
@@ -39,12 +40,14 @@ public class LongRecordReader extends RecordReader<Long, Long> {
 
   @Override
   public Long getCurrentKey() throws IOException, InterruptedException {
-    return (long)(random.nextDouble() * range);
+    return ThreadLocalRandom.current().nextLong(range);
+//    return (long)(random.nextDouble() * range);
   }
 
   @Override
   public Long getCurrentValue() throws IOException, InterruptedException {
-    return (long)(random.nextDouble() * range);
+    return ThreadLocalRandom.current().nextLong(range);
+//    return (long)(random.nextDouble() * range);
   }
 
   @Override
