@@ -58,7 +58,7 @@ public class JoinJobRandom {
           .equalTo(ds2Persist.col("key")), "inner").select();
     } else {
       join = ds1.alias("ds1").join(ds2.alias("ds2"), ds1.col("key")
-          .equalTo(ds2.col("key")), "inner").select("ds1.key", "value1");
+          .equalTo(ds2.col("key")), "inner").select("ds1.key", "value1", "value2");
     }
     LOG.info("Final total: " + join.count());
     LOG.info("Time: " + (System.nanoTime() - start) / 1000000);
