@@ -34,7 +34,7 @@ public class JoinJobRandom {
 
     SQLContext sqlContext = new SQLContext(sc);
     Dataset<Row> ds1 = sqlContext.createDataset(JavaPairRDD.toRDD(input1),
-        Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value");
+        Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value1");
     LOG.info("Total elements 1: " + ds1.count());
     Dataset<Row> ds1Persist = null;
     if (persist) {
@@ -44,7 +44,7 @@ public class JoinJobRandom {
 
     JavaPairRDD<Long, Long> input2 = sc.newAPIHadoopRDD(configuration, LongInputFormat.class, Long.class, Long.class);
     Dataset<Row> ds2 = sqlContext.createDataset(JavaPairRDD.toRDD(input2),
-        Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value");
+        Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value2");
     LOG.info("Total elements 2: " + ds1.count());
     Dataset<Row> ds2Persist = null;
     if (persist) {
@@ -58,7 +58,7 @@ public class JoinJobRandom {
           .equalTo(ds2Persist.col("key")), "inner").select();
     } else {
       join = ds1.alias("ds1").join(ds2.alias("ds2"), ds1.col("key")
-          .equalTo(ds2.col("key")), "inner").select();
+          .equalTo(ds2.col("key")), "inner").select("key", "value1");
     }
     LOG.info("Final total: " + join.count());
     LOG.info("Time: " + (System.nanoTime() - start) / 1000000);
