@@ -4,6 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -62,13 +63,18 @@ public class JoinJobRandom {
     }
     LOG.info("Final total: " + join.count());
     LOG.info("Time: " + (System.nanoTime() - start) / 1000000);
-
+    Dataset<Row> f = join.filter(new FilterFunction<Row>() {
+      @Override
+      public boolean call(Row row) throws Exception {
+        return false;
+      }
+    });
     if (args.length > 3) {
-      join.write().csv(args[3]);
+      f.write().csv(args[3]);
     } /*else {
       join.foreach(r -> {
-        Long key = r.getLong(0);
-        Long v1 = r.getLong(1);
+        Long key = f.getLong(0);
+        Long v1 = f.getLong(1);
       });
     }*/
     sc.stop();
