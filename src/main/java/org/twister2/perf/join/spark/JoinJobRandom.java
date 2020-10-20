@@ -8,6 +8,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.storage.StorageLevel;
 import org.twister2.perf.join.spark.input.LongInputFormat;
 
 import java.util.logging.Logger;
@@ -28,15 +29,18 @@ public class JoinJobRandom {
 
     JavaPairRDD<Long, Long> input1 = sc.newAPIHadoopRDD(configuration, LongInputFormat.class, Long.class, Long.class);
     LOG.info("No of Partitions of input 1 : " + input1.getNumPartitions());
-    JavaPairRDD<Long, Long> input2 = sc.newAPIHadoopRDD(configuration, LongInputFormat.class, Long.class, Long.class);
+
 
     SQLContext sqlContext = new SQLContext(sc);
     Dataset<Row> ds1 = sqlContext.createDataset(JavaPairRDD.toRDD(input1),
         Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value");
+    ds1.persist(StorageLevel.MEMORY_AND_DISK());
     LOG.info("Total elements 1: " + ds1.count());
 
+    JavaPairRDD<Long, Long> input2 = sc.newAPIHadoopRDD(configuration, LongInputFormat.class, Long.class, Long.class);
     Dataset<Row> ds2 = sqlContext.createDataset(JavaPairRDD.toRDD(input2),
         Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value");
+    ds2.persist(StorageLevel.MEMORY_AND_DISK());
     LOG.info("Total elements 2: " + ds1.count());
 
     Dataset<Row> join = ds1.alias("ds1").join(ds2.alias("ds2"), ds1.col("key")
