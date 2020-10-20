@@ -12,8 +12,10 @@ public class LongRecordReader extends RecordReader<Long, Long> {
   private static final Logger LOG = Logger.getLogger(LongRecordReader.class.getName());
 
   private int numRecords = 625000;
+  private int paralle = 4;
   private int currentRead = 0;
   private Random random;
+  private long range = 0;
 
   public LongRecordReader() {
     random = new Random(System.nanoTime());
@@ -23,6 +25,8 @@ public class LongRecordReader extends RecordReader<Long, Long> {
   public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext)
       throws IOException, InterruptedException {
     numRecords = taskAttemptContext.getConfiguration().getInt("records", 1000);
+    paralle = taskAttemptContext.getConfiguration().getInt("parallel", 4);
+    range = numRecords * paralle;
     LOG.info("Num records: " + numRecords);
   }
 
@@ -33,12 +37,12 @@ public class LongRecordReader extends RecordReader<Long, Long> {
 
   @Override
   public Long getCurrentKey() throws IOException, InterruptedException {
-    return random.nextLong();
+    return (long)(random.nextFloat() * range);
   }
 
   @Override
   public Long getCurrentValue() throws IOException, InterruptedException {
-    return random.nextLong();
+    return (long)(random.nextFloat() * range);
   }
 
   @Override
