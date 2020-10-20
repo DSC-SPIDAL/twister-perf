@@ -64,7 +64,7 @@ public class JoinJobRandom {
     LOG.info("Time: " + (System.nanoTime() - start) / 1000000);
 
     if (args.length > 3) {
-      join.write().text(args[3]);
+      join.write().csv(args[3]);
     } /*else {
       join.foreach(r -> {
         Long key = r.getLong(0);
