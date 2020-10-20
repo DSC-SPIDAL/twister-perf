@@ -28,7 +28,7 @@ public class LongRecordReader extends RecordReader<Long, Long> {
       throws IOException, InterruptedException {
     numRecords = taskAttemptContext.getConfiguration().getInt("records", 1000);
     paralle = taskAttemptContext.getConfiguration().getInt("parallel", 4);
-    range = numRecords * paralle;
+    range = (long)numRecords * (long) paralle;
     random = new Random(System.nanoTime() + SparkEnv.get().executorId().hashCode());
     LOG.info("Num records: " + numRecords + " " + SparkEnv.get().executorId());
   }
@@ -40,14 +40,14 @@ public class LongRecordReader extends RecordReader<Long, Long> {
 
   @Override
   public Long getCurrentKey() throws IOException, InterruptedException {
-    return ThreadLocalRandom.current().nextLong(range);
-//    return (long)(random.nextDouble() * range);
+//    return ThreadLocalRandom.current().nextLong(range);
+    return (long)(random.nextDouble() * range);
   }
 
   @Override
   public Long getCurrentValue() throws IOException, InterruptedException {
-    return ThreadLocalRandom.current().nextLong(range);
-//    return (long)(random.nextDouble() * range);
+//    return ThreadLocalRandom.current().nextLong(range);
+    return (long)(random.nextDouble() * range);
   }
 
   @Override
