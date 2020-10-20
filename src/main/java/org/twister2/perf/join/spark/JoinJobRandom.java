@@ -44,9 +44,11 @@ public class JoinJobRandom {
     LOG.info("Total elements 2: " + ds1.count());
     Dataset<Row> ds2Persist =ds2.persist(StorageLevel.MEMORY_AND_DISK());
 
+    long start = System.nanoTime();
     Dataset<Row> join = ds1Persist.alias("ds1").join(ds2Persist.alias("ds2"), ds1Persist.col("key")
         .equalTo(ds2Persist.col("key")), "inner").select();
     LOG.info("Final total: " + join.count());
+    LOG.info("Time: " + (System.nanoTime() - start) / 1000000);
 
     if (args.length > 3) {
       join.write().text(args[3]);
