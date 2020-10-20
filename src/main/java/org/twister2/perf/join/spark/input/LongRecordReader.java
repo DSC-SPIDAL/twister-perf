@@ -3,6 +3,7 @@ package org.twister2.perf.join.spark.input;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.spark.SparkEnv;
 
 import java.io.IOException;
 import java.util.Random;
@@ -27,6 +28,7 @@ public class LongRecordReader extends RecordReader<Long, Long> {
     numRecords = taskAttemptContext.getConfiguration().getInt("records", 1000);
     paralle = taskAttemptContext.getConfiguration().getInt("parallel", 4);
     range = numRecords * paralle;
+    random = new Random(System.nanoTime() + SparkEnv.get().executorId().hashCode());
     LOG.info("Num records: " + numRecords);
   }
 
