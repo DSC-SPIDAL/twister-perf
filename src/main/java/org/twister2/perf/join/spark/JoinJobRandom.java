@@ -67,9 +67,8 @@ public class JoinJobRandom {
       join.write().text(args[3]);
     } else {
       join.foreach(r -> {
-        Integer key = r.getInt(0);
-        Long v1 = r.getLong(2);
-        Long v2 = r.getLong(3);
+        Long key = r.getLong(0);
+        Long v1 = r.getLong(1);
       });
     }
     sc.stop();
