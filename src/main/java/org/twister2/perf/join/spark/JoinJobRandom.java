@@ -65,12 +65,12 @@ public class JoinJobRandom {
 
     if (args.length > 3) {
       join.write().text(args[3]);
-    } else {
+    } /*else {
       join.foreach(r -> {
         Long key = r.getLong(0);
         Long v1 = r.getLong(1);
       });
-    }
+    }*/
     sc.stop();
     LOG.info("Stopping join job...");
   }
