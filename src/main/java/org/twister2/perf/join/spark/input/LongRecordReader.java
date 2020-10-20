@@ -29,7 +29,7 @@ public class LongRecordReader extends RecordReader<Long, Long> {
     paralle = taskAttemptContext.getConfiguration().getInt("parallel", 4);
     range = numRecords * paralle;
     random = new Random(System.nanoTime() + SparkEnv.get().executorId().hashCode());
-    LOG.info("Num records: " + numRecords);
+    LOG.info("Num records: " + numRecords + " " + SparkEnv.get().executorId());
   }
 
   @Override
