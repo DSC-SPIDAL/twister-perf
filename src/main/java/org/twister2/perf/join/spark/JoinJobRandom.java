@@ -36,7 +36,7 @@ public class JoinJobRandom {
     SQLContext sqlContext = new SQLContext(sc);
     Dataset<Row> ds1 = sqlContext.createDataset(JavaPairRDD.toRDD(input1),
         Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value1");
-    LOG.info("Total elements 1: " + ds1.count());
+//    LOG.info("Total elements 1: " + ds1.count());
     Dataset<Row> ds1Persist = null;
     if (persist) {
       ds1Persist = ds1.persist(StorageLevel.DISK_ONLY());
@@ -46,7 +46,7 @@ public class JoinJobRandom {
     JavaPairRDD<Long, Long> input2 = sc.newAPIHadoopRDD(configuration, LongInputFormat.class, Long.class, Long.class);
     Dataset<Row> ds2 = sqlContext.createDataset(JavaPairRDD.toRDD(input2),
         Encoders.tuple(Encoders.LONG(), Encoders.LONG())).toDF("key", "value2");
-    LOG.info("Total elements 2: " + ds1.count());
+//    LOG.info("Total elements 2: " + ds1.count());
     Dataset<Row> ds2Persist = null;
     if (persist) {
       ds2Persist = ds2.persist(StorageLevel.DISK_ONLY());
