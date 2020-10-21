@@ -61,7 +61,7 @@ public class JoinJobRandom {
       join = ds1.alias("ds1").join(ds2.alias("ds2"), ds1.col("key")
           .equalTo(ds2.col("key")), "inner").select("ds1.key", "value1", "value2");
     }
-    LOG.info("Final total: " + join.count());
+//    LOG.info("Final total: " + join.count());
 
 //    Dataset<Row> f = join.filter(new FilterFunction<Row>() {
 //      @Override
@@ -69,7 +69,7 @@ public class JoinJobRandom {
 //        return false;
 //      }
 //    });
-    LOG.info("Filter " + join.count() + " Time: " + (System.nanoTime() - start) / 1000000);
+//    LOG.info("Filter " + join.count() + " Time: " + (System.nanoTime() - start) / 1000000);
     if (args.length > 3) {
       join.write().csv(args[3]);
     } /*else {
