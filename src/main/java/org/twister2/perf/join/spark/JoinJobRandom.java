@@ -56,10 +56,10 @@ public class JoinJobRandom {
     Dataset<Row> join;
     if (persist) {
       join = ds1Persist.alias("ds1").join(ds2Persist.alias("ds2"), ds1Persist.col("key")
-          .equalTo(ds2Persist.col("key")), "inner").select("ds1.key", "value1", "value2");
+          .equalTo(ds2Persist.col("key")), "inner").select("ds1.key", "value1", "value2").persist(StorageLevel.MEMORY_AND_DISK());
     } else {
       join = ds1.alias("ds1").join(ds2.alias("ds2"), ds1.col("key")
-          .equalTo(ds2.col("key")), "inner").select("ds1.key", "value1", "value2");
+          .equalTo(ds2.col("key")), "inner").select("ds1.key", "value1", "value2").persist(StorageLevel.MEMORY_AND_DISK());
     }
 //    LOG.info("Final total: " + join.count());
 
