@@ -61,23 +61,20 @@ public class JoinJobRandom {
       join = ds1.alias("ds1").join(ds2.alias("ds2"), ds1.col("key")
           .equalTo(ds2.col("key")), "inner").select("ds1.key", "value1", "value2").persist(StorageLevel.MEMORY_AND_DISK());
     }
-//    LOG.info("Final total: " + join.count());
 
-    Dataset<Row> f = join.filter(new FilterFunction<Row>() {
-      @Override
-      public boolean call(Row row) throws Exception {
-        return false;
-      }
-    });
+//    LOG.info("Final total: " + join.count());
 //    LOG.info("Filter " + join.count() + " Time: " + (System.nanoTime() - start) / 1000000);
     if (args.length > 3) {
-      f.write().csv(args[3]);
-    } /*else {
-      join.foreach(r -> {
-        Long key = f.getLong(0);
-        Long v1 = f.getLong(1);
+      Dataset<Row> f = join.filter(new FilterFunction<Row>() {
+        @Override
+        public boolean call(Row row) throws Exception {
+          return false;
+        }
       });
-    }*/
+      f.write().csv(args[3]);
+    } else {
+      join.count();
+    }
     sc.stop();
     LOG.info("Stopping join job...");
   }
