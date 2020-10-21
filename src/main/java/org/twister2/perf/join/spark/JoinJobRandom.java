@@ -63,15 +63,15 @@ public class JoinJobRandom {
     }
 //    LOG.info("Final total: " + join.count());
 
-//    Dataset<Row> f = join.filter(new FilterFunction<Row>() {
-//      @Override
-//      public boolean call(Row row) throws Exception {
-//        return false;
-//      }
-//    });
+    Dataset<Row> f = join.filter(new FilterFunction<Row>() {
+      @Override
+      public boolean call(Row row) throws Exception {
+        return false;
+      }
+    });
 //    LOG.info("Filter " + join.count() + " Time: " + (System.nanoTime() - start) / 1000000);
     if (args.length > 3) {
-      join.write().csv(args[3]);
+      f.write().csv(args[3]);
     } /*else {
       join.foreach(r -> {
         Long key = f.getLong(0);
