@@ -39,7 +39,7 @@ public class JoinJobRandom {
     LOG.info("Total elements 1: " + ds1.count());
     Dataset<Row> ds1Persist = null;
     if (persist) {
-      ds1Persist = ds1.persist(StorageLevel.MEMORY_AND_DISK());
+      ds1Persist = ds1.persist(StorageLevel.DISK_ONLY());
     }
 
 
@@ -49,7 +49,7 @@ public class JoinJobRandom {
     LOG.info("Total elements 2: " + ds1.count());
     Dataset<Row> ds2Persist = null;
     if (persist) {
-      ds2Persist = ds2.persist(StorageLevel.MEMORY_AND_DISK());
+      ds2Persist = ds2.persist(StorageLevel.DISK_ONLY());
     }
 
     long start = System.nanoTime();

@@ -5,11 +5,13 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.storage.StorageLevel;
 import org.twister2.perf.shuffle.io.EmptyOutputFormat;
 import scala.Tuple2;
 
@@ -24,8 +26,28 @@ public class InputPartitionJob {
     boolean out = Boolean.parseBoolean(args[3]);
     boolean dataSet = Boolean.parseBoolean(args[4]);
 
+    Function<String, String> mapFn = new Function<String, String>() {
+      @Override
+      public String call(String s) throws Exception {
+        return null;
+      }
+    };
+
+    Function<String, Boolean> filterFn = new Function<String, Boolean>() {
+      @Override
+      public Boolean call(String s) throws Exception {
+        return null;
+      }
+    };
+
     JavaSparkContext sc = new JavaSparkContext(conf);
     JavaRDD<String> input = sc.textFile(prefix, parallel);
+    JavaRDD<String> filtered = input.filter(filterFn);
+    // persist the data to the stable storage
+    JavaRDD<String> persisted = filtered.persist(StorageLevel.MEMORY_AND_DISK());
+    // use the persisted values
+    persisted.map(mapFn);
+
 
     JavaPairRDD<BigInteger, Long>  source = input.mapToPair(new PairFunction<String, BigInteger, Long>() {
       @Override
